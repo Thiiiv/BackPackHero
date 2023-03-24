@@ -2,7 +2,7 @@ package essai;
 
 import java.util.Objects;
 
-public class Bow implements Weapons{
+public class Sword implements Weapons {
 	
 	private final String name;
 	private final int rarity;
@@ -11,8 +11,8 @@ public class Bow implements Weapons{
 	private int protection;
 	private  int manacost;
 	
-	public Bow(String name,int rarity,int energycost,int damage,int protection,int manacost) {
-		this.name=Objects.requireNonNull(name,"Give a name for the bow");
+	public Sword(String name,int rarity,int energycost,int damage,int protection,int manacost) {
+		this.name=Objects.requireNonNull(name,"Give a name for the sword");
 		this.rarity=rarity;
 		this.energycost=energycost;
 		this.damage=damage;
@@ -64,4 +64,5 @@ public class Bow implements Weapons{
 		return manacost;
 	}
 	
+
 }
