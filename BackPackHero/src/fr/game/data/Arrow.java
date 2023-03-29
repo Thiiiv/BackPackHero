@@ -15,7 +15,7 @@ public class Arrow implements Weapon{
 		this.getName=Objects.requireNonNull(getName,"Give a name for the Arrow");
 		this.getRarity=Objects.requireNonNull(getRarity,"Give a rarity for the Arrow");
 		this.getAttackPoint=getAttackPoint;
-		this.getEnergyPoint=getAttackPoint;
+		this.getEnergyPoint=getEnergyPoint;
 		this.usage=usage;
 		
 		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");

@@ -14,7 +14,7 @@ public class MeleeWeapon implements Weapon{
 		//this.getName=Objects.requireNonNull("Wooden Sword","Give a name for the meleeWeapon");
 		this.getRarity=Objects.requireNonNull(getRarity,"Give a rarity for the meleeWeapon");
 		this.getAttackPoint=getAttackPoint;
-		this.getEnergyPoint=getAttackPoint;
+		this.getEnergyPoint=getEnergyPoint;
 		
 		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
 		
@@ -55,7 +55,8 @@ public class MeleeWeapon implements Weapon{
 		var builder=new StringBuilder();
 		builder.append("------\n");
 		builder.append(getName+" is "+getRarity);
-		builder.append(". The weapon make "+ getAttackPoint +" damage and "+getEnergyPoint+" energycost ");
+		builder.append(". The weapon make "+ getAttackPoint+" damage and ");
+		builder.append(getEnergyPoint+" energycost ");
 		builder.append("\n------\n");
 		
 		return builder.toString();

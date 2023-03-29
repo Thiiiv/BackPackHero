@@ -15,7 +15,7 @@ public class MagicWand implements Weapon{
 		this.getName=Objects.requireNonNull(getName,"Give a name for the RangedWeapon");
 		this.getRarity=Objects.requireNonNull(getRarity,"Give a rarity for the RangedWeapon");
 		this.getAttackPoint=getAttackPoint;
-		this.getEnergyPoint=getAttackPoint;
+		this.getEnergyPoint=getEnergyPoint;
 		this.getManaPoint=getManaPoint;
 		
 		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
