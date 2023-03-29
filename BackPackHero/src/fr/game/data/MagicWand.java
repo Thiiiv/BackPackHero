@@ -18,7 +18,7 @@ public class MagicWand implements Weapon{
 		this.getEnergyPoint=getEnergyPoint;
 		this.getManaPoint=getManaPoint;
 		
-		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
+		var rarity = List.of("Common", "Uncommon","Rare","Legendary");
 		
 		if (rarity.contains(getRarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");

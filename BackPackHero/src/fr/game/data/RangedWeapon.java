@@ -16,7 +16,7 @@ public class RangedWeapon implements Weapon{
 		this.getAttackPoint=getAttackPoint;
 		this.getEnergyPoint=getEnergyPoint;
 		
-		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
+		var rarity = List.of("Common", "Uncommon","Rare","Legendary");
 		
 		if (rarity.contains(getRarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
