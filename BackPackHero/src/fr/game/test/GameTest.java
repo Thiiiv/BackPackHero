@@ -1,7 +1,4 @@
 package fr.game.test;
-import fr.game.data.Healer;
-import fr.game.data.Hero;
-import fr.game.data.Monster;
 import fr.game.data.*;
 
 public class GameTest {
@@ -61,6 +58,32 @@ public class GameTest {
 		// On affiche le nombre de points d'attaque du héros
 		System.out.println(hero.attackPoint());
 		
+		
+		
+		//On crée un nouveau hero
+		var zero=new Hero();
+		//on affiche ensuite sa santé
+		System.out.println(zero.health());
+		
+		//Création de plusieur équipements
+		var sword=new MeleeWeapon("Common", 10, 11);
+		var shield=new Shield("Bouclier","Common",0,1, 5);
+		var bow=new RangedWeapon("Arc","Rare", 10, 1);
+		var sword2=new MeleeWeapon("Common", 10, 11);
+		//On affiche tout ces equipements
+		System.out.println(sword);
+		System.out.println(shield);
+		System.out.println(bow);
+		
+		//Objet avec une rareté impossible est crée
+		//var baton=new MagicWand("Magic", "Epic", 2, 1, 2);
+		
+		zero.equip(sword);
+		zero.equip(shield);
+		zero.equip(bow);
+		zero.equip(sword2);
+		System.out.println(hero.attackPoint());
+	
 	}
 
 }
