@@ -106,4 +106,9 @@ public class Hero implements Character {
 	public static void improveHealth() {
 		
 	}
+
+	@Override
+	public boolean beAttacked(Character character) {
+		return true;
+	}
 }
