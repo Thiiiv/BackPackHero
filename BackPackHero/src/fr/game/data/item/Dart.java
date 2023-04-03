@@ -107,26 +107,26 @@ public class Dart implements Weapon{
 
 	@Override
 	public String ApplyToItem(String item) {
-		return null;
+		return item;
 	}
 
 	@Override
 	public String ApplyToCharacter(String character) {
-		return null;
+		return character;
 	}
 
 	@Override
 	public int getPrice() {
-		return 0;
+		return 1;
 	}
 
 	@Override
 	public int getSellPrice() {
-		return 0;
+		return 1;
 	}
 
 	@Override
 	public int getSize() {
-		return 0;
+		return 1;
 	}
 }

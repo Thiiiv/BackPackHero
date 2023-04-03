@@ -38,12 +38,12 @@ public class GoldCoins implements Item {
 
 	@Override
 	public String ApplyToItem(String item) {
-		return null;
+		return item;
 	}
 
 	@Override
 	public String ApplyToCharacter(String character) {
-		return null;
+		return character;
 	}
 	
 	@Override
@@ -63,7 +63,7 @@ public class GoldCoins implements Item {
 	
 	@Override
 	public int getSize() {
-		return 0;
+		return 1;
 	}
 	
 	@Override
