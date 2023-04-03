@@ -144,7 +144,7 @@ public record GameView(GameData data, ImageLoader loader) {
 						if (data.getFloor().getRoom(j, i) != null) {
 							drawRoom(graphics, dimY, dimX, posX+dimX*i, posY+dimY*j, data.getFloor().getRoom(j, i));
 							if (loader.image(data.getFloor().getRoom(j, i).getRoomIcon()) != null) {
-								System.out.println("roomIcon : " + data.getFloor().getRoom(j, i).getRoomIcon());
+								//System.out.println("roomIcon : " + data.getFloor().getRoom(j, i).getRoomIcon());
 								var roomIcon = loader.image(data.getFloor().getRoom(j, i).getRoomIcon());
 								drawImage(graphics, roomIcon, posX+10+dimX*i, posY+10+dimY*j, dimX/2, dimY/2);
 							}
@@ -245,9 +245,11 @@ public record GameView(GameData data, ImageLoader loader) {
 				drawMapButton(context, (int) width, (int) height, data);
 			}
 		}
+
 	}
 
 	public static void draw(ApplicationContext context, GameData data, GameView view) {
 		context.renderFrame(graphics -> view.draw(graphics, context, data));
 	}
+
 }

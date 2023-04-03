@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,7 +12,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
+import fr.game.data.Corridor;
+import fr.game.data.ExitDoor;
+import fr.game.data.Healer;
 import fr.game.data.Inventory;
+import fr.game.data.Merchant;
+import fr.game.data.Treasure;
+import fr.game.data.Wall;
 import fr.game.data.item.MeleeWeapon;
 import fr.umlv.zen5.Application;
 import fr.umlv.zen5.ApplicationContext;
@@ -20,7 +31,21 @@ import fr.umlv.zen5.KeyboardKey;
 
 public class GameController {
 
+	private static final int MAX_ROWS = 0;
+	private static final int MAX_COLS = 0;
+
 	public GameController() {
+	}
+
+	private static void playMusic() {
+		try {
+			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("data/music.wav"));
+			Clip clip = AudioSystem.getClip();
+			clip.open(audioInputStream);
+			clip.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static boolean gameLoop(ApplicationContext context, GameData data, GameView view) {
@@ -93,6 +118,7 @@ public class GameController {
 								dimPlay[0], dimPlay[1])) {
 							data.setMenuState(false);
 							GameView.draw(context, data, view);
+							playMusic();
 						} else {
 							posMenuButton = view.getExitButtonPosition(height, width);
 							if (data.clickOnMenuButton(location.x, location.y, posMenuButton[0], posMenuButton[1],
@@ -132,4 +158,48 @@ public class GameController {
 			}
 		});
 	}
+	
+	/*public void moveHero(int row, int col) {
+	    if (row < 0 || row >= MAX_ROWS || col < 0 || col >= MAX_COLS) {
+	        System.out.println("Vous ne pouvez pas vous déplacer en dehors du donjon !");
+	        return;
+	    }
+
+	    Wall[][] floor;
+		if (floor[row][col] instanceof Wall) {
+	        System.out.println("Vous ne pouvez pas traverser un mur !");
+	        return;
+	    }
+
+	    if (floor[row][col] instanceof Corridor) {
+	        Corridor corridor = (Corridor) floor[row][col];
+	        if (corridor.isThereMonster()) {
+	            System.out.println("Vous avez rencontré des monstres !");
+	            // ici, vous pouvez ajouter le code pour le combat contre les monstres
+	            return;
+	        }
+	    } else if (floor[row][col] instanceof Treasure) {
+	        Treasure treasure = (Treasure) floor[row][col];
+	        System.out.println("Vous avez trouvé un trésor !");
+	        // ici, vous pouvez ajouter le code pour ouvrir le trésor
+	    } else if (floor[row][col] instanceof Healer) {
+	        Healer healer = (Healer) floor[row][col];
+	        System.out.println("Vous êtes tombé sur un guérisseur !");
+	        // ici, vous pouvez ajouter le code pour obtenir des soins
+	    } else if (floor[row][col] instanceof ExitDoor) {
+	        System.out.println("Vous avez atteint la porte de sortie !");
+	        // ici, vous pouvez ajouter le code pour passer au niveau suivant
+	    } else if (floor[row][col] instanceof Merchant) {
+	        Merchant merchant = (Merchant) floor[row][col];
+	        System.out.println("Vous êtes tombé sur un marchand !");
+	        // ici, vous pouvez ajouter le code pour acheter des objets
+	    }
+
+	    // déplacer le héros
+	    floor[heroRow][heroCol].removeCharacter(hero);
+	    floor[row][col].addCharacter(hero);
+	    heroRow = row;
+	    heroCol = col;
+	    eachFloor();
+	}*/
 }
