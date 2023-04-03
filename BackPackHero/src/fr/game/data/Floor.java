@@ -39,15 +39,23 @@ public class Floor {
 	            matrice[i][j] = ' ';
 	        }
 	    }
-
-	    // Mettre à jour la matrice avec les salles
+	    
+	    // Ajouter les différents types de pièces à la matrice
 	    for (int i = 0; i < rows; i++) {
 	        for (int j = 0; j < cols; j++) {
-	            if (floor[i][j] == null) {
-	                // La cellule est vide, ne rien faire
-	            } else if (floor[i][j] instanceof Room) {
-	                // La cellule contient une instance de Room, mettre à jour avec un symbole approprié
+	            if (floor[i][j] instanceof Corridor) {
 	                matrice[i][j] = '■';
+	                if (((Corridor)floor[i][j]).isThereMonster()) {
+	                    matrice[i][j] = Character.forDigit(((Corridor)floor[i][j]).getMonsters().size(), 10);
+	                }
+	            } else if (floor[i][j] instanceof Treasure) {
+	                matrice[i][j] = 'T';
+	            } else if (floor[i][j] instanceof Healer) {
+	                matrice[i][j] = 'H';
+	            } else if (floor[i][j] instanceof ExitDoor) {
+	                matrice[i][j] = 'E';
+	            } else if (floor[i][j] instanceof Merchant) {
+	                matrice[i][j] = 'M';
 	            }
 	        }
 	    }

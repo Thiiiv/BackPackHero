@@ -13,25 +13,23 @@ public class Corridor implements Room {
 	private boolean isHeroHere = false;
 	private String roomIcon;
 
-	public Corridor() {
-		this.list = new ArrayList<Monster>();
-		this.roomIcon = "corridor.png";
-		Random monsterRandom = new Random();
-		int nbMonster = monsterRandom.nextInt(3);
-		switch (nbMonster) {
-		case 0 :
-			break;
-		case 1:
-			this.roomIcon = "monster.png";
-			list.add(new Monster());
-			break;
-		case 2:
-			this.roomIcon = "monster.png";
-			list.add(new Monster());
-			list.add(new Monster());
-			break;
-		}
-	}
+	public Corridor(int nbMonster) {
+        this.list = new ArrayList<Monster>();
+        this.roomIcon = "corridor.png";
+        switch (nbMonster) {
+        case 0 :
+            break;
+        case 1:
+            this.roomIcon = "monster.png";
+            list.add(new Monster());
+            break;
+        case 2:
+            this.roomIcon = "monster.png";
+            list.add(new Monster());
+            list.add(new Monster());
+            break;
+        }
+    }
 
 	@Override
 	public String getName() {
