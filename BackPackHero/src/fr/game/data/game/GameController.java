@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
+import fr.game.data.Coordonnees;
+import fr.game.data.item.Item;
 import fr.game.data.item.MeleeWeapon;
 import fr.game.data.item.RangedWeapon;
 import fr.umlv.zen5.Application;
@@ -37,6 +40,10 @@ public class GameController {
 			FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
 			// Diminution du volume de la musique de fond de 25 décibels
 			volumeControl.setValue(volumeControl.getValue() - 25f);
+			var mute = true;
+			if (mute) {
+				volumeControl.setValue(volumeControl.getMinimum());
+			}
 			// Jouer la musique en boucle
 
 		} catch (Exception e) {
@@ -45,7 +52,7 @@ public class GameController {
 	}
 
 	private static boolean gameLoop(ApplicationContext context, GameData data, GameView view) {
-		var event = context.pollOrWaitEvent(10);
+		var event = context.pollOrWaitEvent(1000000);
 		if (event == null) {
 			return true;
 		}
@@ -86,16 +93,17 @@ public class GameController {
 		var dimMapButton = view.getMapButtonsize();
 		float[] floorCoordonnees = null;
 		while (true) {
-			var event = context.pollOrWaitEvent(10);
-			if (!gameLoop(context, data, view)) {
+			var event = context.pollOrWaitEvent((long) Math.pow(10, 8));
+			/*if (!gameLoop(context, data, view)) {
 				// System.out.println("Thank you for quitting!");
 				context.exit(0);
-			}
+			}*/
 			if (event == null) {
 				continue;
 			}
 			var action = event.getAction();
-			if (action != Action.KEY_PRESSED) {
+			//System.out.println("Une action a été effectué : " + action);
+			if (action == Action.POINTER_DOWN) {
 				var location = event.getLocation();
 				/*
 				 * System.out.println(data.clickOnButton(location.x, location.y, (int) (width -
@@ -136,19 +144,47 @@ public class GameController {
 							break;
 						case "inventoryButton":
 							GameView.draw(context, data, view);
+							break;
 						}
 					}
-					//System.out.println("floorCoordonnees : " + floorCoordonnees);
+						//System.out.println("floorCoordonnees : " + floorCoordonnees);
 					if (floorCoordonnees != null) {
 						//System.out.println(floorCoordonnees[0] + " " + floorCoordonnees[1] + " " + (int) floorCoordonnees[2] + " " + (int) floorCoordonnees[3]);
 						var detectRoom = data.clickOnMap(location.x, location.y, floorCoordonnees[0], floorCoordonnees[1], (int) floorCoordonnees[2], (int) floorCoordonnees[3]);
 						//System.out.println("detectRoom : " + detectRoom);
 						if (detectRoom != null) {
-							System.out.println("detectRoom : " + detectRoom);
+							//System.out.println("detectRoom : " + detectRoom);
 							view.goToRoom(context, (int) height, (int) width, data, detectRoom);
 						}
 					}
+					var isItemHere = data.clickOnItem(location.x, location.y);
+					if (isItemHere != null) {
+						Item clickedItem = (Item) isItemHere.values().toArray()[0];
+						Coordonnees clickedItemPos = (Coordonnees) isItemHere.keySet().toArray()[0];
+						System.out.println("Le joueur a cliqué sur l'item : \n" + clickedItem);
+						view.drawItemSelector(context, clickedItemPos, clickedItem, data);
+						data.removeObjectPosition(clickedItem, clickedItemPos.x1(), clickedItemPos.y1(), clickedItemPos.x2(), clickedItemPos.y2());
+						boolean isItemSelected = true;
+						while (isItemSelected) {
+							event = context.pollOrWaitEvent((long) Math.pow(10, 8));
+							action = event.getAction();
+							if (action == Action.POINTER_DOWN) {
+								location = event.getLocation();
+								if (location != null) {
+									//data.addObjectPosition(clickedItem, clickedItemPos.x1(), clickedItemPos.y1(), clickedItemPos.x2(), clickedItemPos.y2());
+									view.drawItem(context, location.x, location.y, clickedItem, data);
+									isItemSelected = false;
+									
+								}
+							}
+						}
+						
+						
+					}
 				}
+			}
+			if ((action == Action.KEY_PRESSED || action == Action.KEY_RELEASED) && event.getKey() == KeyboardKey.Q) {
+				context.exit(0);
 			}
 			// System.out.println("MapButtonState : " + data.getMapButtonState());
 			// System.out.println("InventoryButtonState : " +

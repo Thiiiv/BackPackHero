@@ -20,4 +20,11 @@ public record Coordonnees(float x1, float y1, float x2, float y2) {
 	public int y() {
 		return (int) y1;
 	}
+	
+	public boolean isPointInside(float x, float y) {
+		if (x > x1 && x < x2 && y < y2 && y > y1) {
+			return true;
+		}
+		return false;
+	}
 }

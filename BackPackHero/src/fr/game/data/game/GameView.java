@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -78,14 +79,28 @@ public record GameView(GameData data, ImageLoader loader) {
 			var sizeItem = item.getSize();
 			// System.out.println(item.itemImage());
 			drawImage(graphics, image, posX, posY, dimx * sizeItem[0].length, dimy * sizeItem.length, data, item);
-			System.out.println("La position des objets : " + data.getObjectsPosition());
+			//System.out.println("La position des objets : " + data.getObjectsPosition());
 		}
+	}
+	
+	public void drawItem(ApplicationContext context, float posX, float posY, Item item, GameData data) {
+		context.renderFrame(graphics -> {
+			if (item != null) {
+				var image = loader.image(item.itemImage());
+				var cellSize = loader.image("cell.png");
+				var sizeItem = item.getSize();
+				// System.out.println(item.itemImage());
+				drawImage(graphics, image, posX, posY, cellSize.getWidth() * sizeItem[0].length, cellSize.getHeight() * sizeItem.length, data, item);
+				//System.out.println("La position des objets : " + data.getObjectsPosition());
+			}
+		});
 	}
 
 	public void drawMapButton(ApplicationContext context, int height, int width, GameData data) {
 		context.renderFrame(graphics -> {
 			var map = loader.image("mapButton.png");
 			drawImage(graphics, map, width - map.getWidth(), map.getHeight(), map.getWidth(), map.getHeight());
+			data.setInventoryButtonState(false);
 			data.setMapButtonState(true);
 		});
 	}
@@ -293,14 +308,14 @@ public record GameView(GameData data, ImageLoader loader) {
 			}*/
 			var list = List.of(monster);
 			for (var i = 0; i < monster.length; i++) {
-				System.out.println("list.get(i).getCharacterImage() : " + list.get(i).getCharacterImage());
+				//System.out.println("list.get(i).getCharacterImage() : " + list.get(i).getCharacterImage());
 				var image = loader.image(list.get(i).getCharacterImage());
 				if (image != null) {
 					float dimx = (float) (loader.image("hero-4.png").getWidth() * 1.5);
 					float dimy = (float) (loader.image("hero-4.png").getHeight() * 1.5);
 					float posX = (float) (width - (80 + dimx * (i + 1) + i*20));
 					float posY = height - loader.image("hero-4.png").getHeight() * 2;
-					System.out.println("posX : " + posX + " posY : " + posY);
+					//System.out.println("posX : " + posX + " posY : " + posY);
 					var healthBar = new RoundRectangle2D.Float(posX, posY + dimy + 5, dimx, dimx / 8, 10, 10);
 					drawImage(graphics, image, posX, posY, dimx, dimy);
 					graphics.setColor(Color.BLACK);
@@ -335,11 +350,11 @@ public record GameView(GameData data, ImageLoader loader) {
 		posX = (int) ((width / 2) - 2.5 * dimx);
 		posY = dimy / 6;
 		dimy = (float) (cell.getHeight());
-		System.out.println(data.getInventory());
+		//System.out.println(data.getInventory());
 		for (var i = 0; i < 5; i++) {
 			for (var j = 0; j < 3; j++) {
 				drawImage(graphics, cell, posX + dimx * i, posY + dimy * j, dimx, dimy);
-				System.out.println("Objet a l'emplacement [" + j + ", " + i + "] de l'inventaire : " + inventaire.getFromXY(j, i));
+				//System.out.println("Objet a l'emplacement [" + j + ", " + i + "] de l'inventaire : " + inventaire.getFromXY(j, i));
 				
 			}
 		}
@@ -347,6 +362,13 @@ public record GameView(GameData data, ImageLoader loader) {
 			//drawImage(graphics, i.itemImage(), posX + dimx * i, posY + dimy * j, dimx, dimy);
 			drawItem(graphics, posX + dimx * inventaire.get(i).x(), posY + dimy * inventaire.get(i).y(), dimx, dimy, i, data);
 		}
+	}
+	
+	public void drawItemSelector(ApplicationContext context, Coordonnees position, Item item, GameData data) {
+		context.renderFrame(graphics -> {
+			graphics.setColor(Color.GREEN);
+			graphics.draw(new Rectangle2D.Float(position.x1(), position.y1(), position.x2() - position.x1(), position.y2() - position.y1()));
+		});
 	}
 
 	public void draw(Graphics2D graphics, ApplicationContext context, GameData data) {
@@ -359,8 +381,7 @@ public record GameView(GameData data, ImageLoader loader) {
 			drawBackground(graphics, (int) width, (int) height, data);
 			drawInventory(graphics, (int) width, (int) height, data);
 			drawHero(graphics, (int) width, (int) height, data);
-			drawItem(graphics, 500f, 500f, (float) (loader.image("cell.png").getWidth()), (float) (loader.image("cell.png").getHeight()), new MeleeWeapon("Common", 10, 5), data);
-
+			//drawItem(graphics, 500f, 500f, (float) (loader.image("cell.png").getWidth()), (float) (loader.image("cell.png").getHeight()), new MeleeWeapon("Common", 10, 5), data);
 			if (!data.getMapButtonState()) {
 				drawMapButton(context, (int) width, (int) height, data);
 			}

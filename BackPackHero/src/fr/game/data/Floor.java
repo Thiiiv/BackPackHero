@@ -1,5 +1,7 @@
 package fr.game.data;
 
+import java.util.ArrayList;
+
 public class Floor {
 	private final Room[][] floor;
 	
@@ -24,6 +26,16 @@ public class Floor {
 	
 	public Room getRoom(int x, int y) {
 		return floor[x][y];
+	}
+	
+	public ArrayList<Room> getAllRooms() {
+		var list = new ArrayList<Room>();
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 11; j++) {
+				list.add(floor[i][j]);
+			}
+		}
+		return list;
 	}
 	
 	public void eachFloor() {

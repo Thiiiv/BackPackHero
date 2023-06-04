@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import fr.game.data.*;
@@ -17,23 +18,23 @@ import fr.game.data.Coordonnees;
 public class GameData {
 	private final Inventory inventaire;
 	private final Hero hero;
-	private final int actualStage;
+	private final Floor actualStage;
 	private boolean mapButtonState = false;
 	private boolean inventoryButtonState = false;
 	private boolean menuState = true;
 	private final Floor stage1;
 	private final Floor stage2;
 	private final Floor stage3;
-	private final HashMap<Item, HashSet<Coordonnees>> objectPositions;
+	private final HashMap<Coordonnees, Item> objectPositions;
 	
 	public GameData() {
 		this.inventaire = new Inventory();
 		this.hero = new Hero();
-		this.actualStage = 1;
 		this.stage1 = new Floor();
 		this.stage2 = new Floor();
 		this.stage3 = new Floor();
-		this.objectPositions = new HashMap<Item, HashSet<Coordonnees>>();
+		this.actualStage = stage1;
+		this.objectPositions = new HashMap<Coordonnees, Item>();
 		stage1.add(2, 0, new Corridor(0));
 		stage1.add(2, 1, new Corridor(0));
 		stage1.add(2, 2, new Corridor(2));
@@ -164,27 +165,64 @@ public class GameData {
 		
 	}
 	
-	public HashMap<Item, HashSet<Coordonnees>> getObjectsPosition() {
+	public HashMap<Coordonnees, Item> getObjectsPosition() {
 		return objectPositions;
 	}
 	
 	public void addObjectPosition(Item item, float x, float y, float x2, float y2) {
-		if (objectPositions.containsKey(item)) {
-			objectPositions.get(item).add(new Coordonnees(x, y, x2, y2));
-		}
-		else {
-			objectPositions.put(item, new HashSet<Coordonnees>(Set.of(new Coordonnees(x, y, x2, y2))));
+		if (!objectPositions.containsKey(new Coordonnees(x, y, x2, y2))) {
+			objectPositions.put(new Coordonnees(x, y, x2, y2), item);
 		}
 	}
 	
 	public String removeObjectPosition(Item item, float x, float y, float x2, float y2) {
-		if (objectPositions.containsKey(item)) {
-			if (objectPositions.get(item).contains(new Coordonnees(x, y, x2, y2))) {
-				objectPositions.get(item).remove(new Coordonnees(x, y, x2, y2));
+		if (objectPositions.containsKey(new Coordonnees(x, y, x2, y2))) {
+			if (objectPositions.get(new Coordonnees(x, y, x2, y2)).equals(item)) {
+				objectPositions.remove(new Coordonnees(x, y, x2, y2));
 				return "La position de l'objet a été retiré sans problème";
+			}
+			else {
+				return "La position indiquée ne correspond pas à l'objet donnée en paramètre";
 			}
 		}
 		return "Il y a eu un problème";
+	}
+	
+	public Room getCurrentRoom() {
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 11; j++) {
+				if (actualStage.getRoom(i, j).isHeroHere()) {
+					return actualStage.getRoom(i, j);
+				}
+			}
+		}
+		return null;
+	}
+	
+	public boolean setCurrentRoom(int x, int y) {
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 11; j++) {
+				if (j != x && i != y) {
+					if (actualStage.getRoom(i, j).isHeroHere()) {
+						actualStage.getRoom(i, j).setHeroHere(false);
+					}
+				}
+				else {
+					actualStage.getRoom(i, j).setHeroHere(true);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public HashMap<Coordonnees, Item> clickOnItem(float x, float y) {
+		for (var i : objectPositions.keySet()) {
+			if (i.isPointInside(x, y)) {
+				return new HashMap<Coordonnees, Item>(Map.of(i, objectPositions.get(i)));
+			}
+		}
+		return null;
 	}
 	
 	
