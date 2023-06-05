@@ -130,4 +130,9 @@ public class Dart implements Weapon{
 	public int[][] getSize() {
 		return size;
 	}
+
+	@Override
+	public boolean isWeapon() {
+		return true;
+	}
 }

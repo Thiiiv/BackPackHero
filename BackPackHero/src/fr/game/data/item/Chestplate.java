@@ -116,4 +116,9 @@ public class Chestplate implements Armor{
 	public int[][] getSize() {
 		return size;
 	}
+
+	@Override
+	public boolean isWeapon() {
+		return false;
+	}
 }

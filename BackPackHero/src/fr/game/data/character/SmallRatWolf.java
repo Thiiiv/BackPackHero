@@ -7,6 +7,7 @@ public class SmallRatWolf implements Monster{
 	private int defensePoint=16;
 	private int health = 30;
 	private int maxHealth = 30;
+	private boolean isSelected = false;
 	
 	
 	public SmallRatWolf() {
@@ -53,5 +54,15 @@ public class SmallRatWolf implements Monster{
 	@Override
 	public String getCharacterImage() {
 		return "smallRatWolf.png";
+	}
+	
+	@Override
+	public boolean isSelected() {
+		return isSelected;
+	}
+
+	@Override
+	public void setSelected(boolean isOrNot) {
+		isSelected = isOrNot;
 	}
 }

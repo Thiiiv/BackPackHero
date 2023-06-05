@@ -129,4 +129,9 @@ public class Shield implements Weapon{
 	public int[][] getSize() {
 		return size;
 	}
+	
+	@Override
+	public boolean isWeapon() {
+		return false;
+	}
 }

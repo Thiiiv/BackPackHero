@@ -9,5 +9,7 @@ public interface Monster extends Character{
 	public int preventAttack();
 	public String getCharacterImage();
 	public int maxHealth();
+	public boolean isSelected();
+	public void setSelected(boolean isOrNot);
 	
 }

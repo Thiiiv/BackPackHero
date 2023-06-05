@@ -15,5 +15,6 @@ public interface Item {
 	public String itemImage();
 	public boolean equals(Object o);
 	public int hashCode();
+	public boolean isWeapon();
 	
 }

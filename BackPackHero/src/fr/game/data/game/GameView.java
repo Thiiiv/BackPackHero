@@ -10,6 +10,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
@@ -217,7 +218,6 @@ public record GameView(GameData data, ImageLoader loader) {
 				drawMonster(context, (int) height, (int) width, data, corridor.getMonsters().get(0), corridor.getMonsters().get(1));
 				break;
 			}
-
 		}
 
 	}
@@ -257,6 +257,8 @@ public record GameView(GameData data, ImageLoader loader) {
 	public void goToRoom(ApplicationContext context, int height, int width, GameData data,
 			Coordonnees roomCoordonnees) {
 		var room = data.getFloor().getRoom(roomCoordonnees.x(), roomCoordonnees.y());
+		System.out.println("les coordonnees envoyés dans setCurrentRoom : x = " + roomCoordonnees.x() + " y = " +roomCoordonnees.y());
+		data.setCurrentRoom(roomCoordonnees.y(), roomCoordonnees.x());
 		data.setInventoryButtonState(true);
 		data.setMapButtonState(false);
 		switch (room.getName()) {
@@ -312,27 +314,29 @@ public record GameView(GameData data, ImageLoader loader) {
 			}*/
 			var list = List.of(monster);
 			for (var i = 0; i < monster.length; i++) {
-				//System.out.println("list.get(i).getCharacterImage() : " + list.get(i).getCharacterImage());
-				var image = loader.image(list.get(i).getCharacterImage());
-				if (image != null) {
-					float dimx = (float) (loader.image("hero-4.png").getWidth() * 1.5);
-					float dimy = (float) (loader.image("hero-4.png").getHeight() * 1.5);
-					float posX = (float) (width - (80 + dimx * (i + 1) + i*20));
-					float posY = height - loader.image("hero-4.png").getHeight() * 2;
-					//System.out.println("posX : " + posX + " posY : " + posY);
-					var healthBar = new RoundRectangle2D.Float(posX, posY + dimy + 5, dimx, dimx / 8, 10, 10);
-					drawImage(graphics, image, posX, posY, dimx, dimy);
-					graphics.setColor(Color.BLACK);
-					graphics.fill(healthBar);
-					graphics.setColor(new Color(168, 38, 52, 255));
-					graphics.fill(new RoundRectangle2D.Float((float) healthBar.getX(), (float) healthBar.getY(),
-							(float) healthBar.getWidth() * ((float) list.get(i).health() / list.get(i).maxHealth()),
-							(float) healthBar.getHeight(), 10, 10));
-					graphics.setColor(Color.WHITE);
-					Font font = new Font("Lucida Sans", Font.BOLD, 25);
-					graphics.setFont(font);
-					graphics.drawString(list.get(i).health() + "/" + list.get(i).maxHealth(),
-							(posX + dimx) - font.getSize() * 3, posY + dimy + dimx / 8);
+				if (list.get(i).health() > 0) {
+					//System.out.println("list.get(i).getCharacterImage() : " + list.get(i).getCharacterImage());
+					var image = loader.image(list.get(i).getCharacterImage());
+					if (image != null) {
+						float dimx = (float) (loader.image("hero-4.png").getWidth() * 1.5);
+						float dimy = (float) (loader.image("hero-4.png").getHeight() * 1.5);
+						float posX = (float) (width - (80 + dimx * (i + 1) + i*20));
+						float posY = height - loader.image("hero-4.png").getHeight() * 2;
+						//System.out.println("posX : " + posX + " posY : " + posY);
+						var healthBar = new RoundRectangle2D.Float(posX, posY + dimy + 5, dimx, dimx / 8, 10, 10);
+						drawImage(graphics, image, posX, posY, dimx, dimy);
+						graphics.setColor(Color.BLACK);
+						graphics.fill(healthBar);
+						graphics.setColor(new Color(168, 38, 52, 255));
+						graphics.fill(new RoundRectangle2D.Float((float) healthBar.getX(), (float) healthBar.getY(),
+								(float) healthBar.getWidth() * ((float) list.get(i).health() / list.get(i).maxHealth()),
+								(float) healthBar.getHeight(), 10, 10));
+						graphics.setColor(Color.WHITE);
+						Font font = new Font("Lucida Sans", Font.BOLD, 25);
+						graphics.setFont(font);
+						graphics.drawString(list.get(i).health() + "/" + list.get(i).maxHealth(),
+								(posX + dimx) - font.getSize() * 3, posY + dimy + dimx / 8);
+					}
 				}
 			}
 		});
@@ -374,6 +378,34 @@ public record GameView(GameData data, ImageLoader loader) {
 			graphics.draw(new Rectangle2D.Float(position.x1(), position.y1(), position.x2() - position.x1(), position.y2() - position.y1()));
 		});
 	}
+	
+	/*public void drawCombatMenu(ApplicationContext context, int height, int width, GameData data) {
+		context.renderFrame(graphics -> {
+			graphics.
+		});
+		
+	}*/
+	
+	public void drawCurrentRoom(ApplicationContext context, int height, int width, GameData data) {
+		System.out.println("La salle actuelle : " + data.getCurrentRoom().getName());
+		switch(data.getCurrentRoom().getName()) {
+		case "corridor":
+			drawCorridor(context, height, width, data, (Corridor) data.getCurrentRoom());
+			break;
+		case "treasure":
+			drawTreasure(context, height, width, data, (Treasure) data.getCurrentRoom());
+			break;
+		case "healer":
+			drawHealer(context, height, width, data, (Healer) data.getCurrentRoom());
+			break;
+		case "merchant":
+			drawMerchant(context, height, width, data, (Merchant) data.getCurrentRoom());
+			break;
+		case "exitdoor":
+			drawExitDoor(context, height, width, data, (ExitDoor) data.getCurrentRoom());
+			break;
+		}
+	}
 
 	public void draw(Graphics2D graphics, ApplicationContext context, GameData data) {
 		var screenInfo = context.getScreenInfo();
@@ -389,6 +421,10 @@ public record GameView(GameData data, ImageLoader loader) {
 			if (!data.getMapButtonState()) {
 				drawMapButton(context, (int) width, (int) height, data);
 			}
+			else {
+				drawInventoryButton(context, (int) width, (int) height, data);
+			}
+			
 		}
 
 	}

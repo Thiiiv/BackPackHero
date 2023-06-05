@@ -7,6 +7,7 @@ public class RatWolf implements Monster{
 	private int defensePoint=16;
 	private int health = 45;
 	private int maxHealth = 45;
+	private boolean isSelected = false;
 	
 	
 	public RatWolf() {
@@ -41,7 +42,12 @@ public class RatWolf implements Monster{
 	}
 	
 	public void getDamage(int damage) {
-		this.health -= damage;
+		if (this.health - damage < 0) {
+			this.health = 0;
+		}
+		else {
+			this.health -= damage;
+		}
 		 System.out.println("Le " + name + " a encaissé " + damage + " points de dégât.");
 	}
 
@@ -53,6 +59,16 @@ public class RatWolf implements Monster{
 	@Override
 	public String getCharacterImage() {
 		return "smallRatWolf.png";
+	}
+
+	@Override
+	public boolean isSelected() {
+		return isSelected;
+	}
+
+	@Override
+	public void setSelected(boolean isOrNot) {
+		isSelected = isOrNot;
 	}
 
 

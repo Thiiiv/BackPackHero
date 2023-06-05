@@ -82,4 +82,9 @@ public class GoldCoins implements Item {
 	public int hashCode() {
 		return Objects.hash(amount, rarity);
 	}
+	
+	@Override
+	public boolean isWeapon() {
+		return false;
+	}
 }

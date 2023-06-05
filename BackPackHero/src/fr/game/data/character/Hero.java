@@ -63,7 +63,8 @@ public class Hero implements Character {
 	}
 	
 	public void attack(Monster monster) { // add Monster argument
-		System.out.println("Le " + name + "attaque le " + monster + ".");
+		monster.getDamage(attackPoint);
+		
 	}
 	
 	public boolean beAttacked(Monster monster) { // add Monster argument

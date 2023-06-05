@@ -128,4 +128,9 @@ public class MagicWand implements Weapon{
 	public int[][] getSize() {
 		return size;
 	}
+	
+	@Override
+	public boolean isWeapon() {
+		return true;
+	}
 }

@@ -83,4 +83,9 @@ public class ManaStone implements Item {
 	public int hashCode() {
 		return Objects.hash(name, rarity, number);
 	}
+	
+	@Override
+	public boolean isWeapon() {
+		return false;
+	}
 }

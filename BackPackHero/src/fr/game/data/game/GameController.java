@@ -1,6 +1,7 @@
 package fr.game.data.game;
 
 import java.awt.Color;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,9 +16,13 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
 import fr.game.data.Coordonnees;
+import fr.game.data.Corridor;
+import fr.game.data.Room;
+import fr.game.data.character.Monster;
 import fr.game.data.item.Item;
 import fr.game.data.item.MeleeWeapon;
 import fr.game.data.item.RangedWeapon;
+import fr.game.data.item.Weapon;
 import fr.umlv.zen5.Application;
 import fr.umlv.zen5.ApplicationContext;
 import fr.umlv.zen5.Event.Action;
@@ -30,7 +35,7 @@ public class GameController {
 
 	private static void playMusic() {
 		try {
-			
+
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("data/music.wav"));
 			Clip clip = AudioSystem.getClip();
 			clip.open(audioInputStream);
@@ -94,15 +99,15 @@ public class GameController {
 		float[] floorCoordonnees = null;
 		while (true) {
 			var event = context.pollOrWaitEvent((long) Math.pow(10, 8));
-			/*if (!gameLoop(context, data, view)) {
-				// System.out.println("Thank you for quitting!");
-				context.exit(0);
-			}*/
+			/*
+			 * if (!gameLoop(context, data, view)) { //
+			 * System.out.println("Thank you for quitting!"); context.exit(0); }
+			 */
 			if (event == null) {
 				continue;
 			}
 			var action = event.getAction();
-			//System.out.println("Une action a été effectué : " + action);
+			// System.out.println("Une action a été effectué : " + action);
 			if (action == Action.POINTER_DOWN) {
 				var location = event.getLocation();
 				/*
@@ -131,10 +136,20 @@ public class GameController {
 								context.exit(0);
 							}
 						}
-					}
-					else {
+					} else {
 						System.out.println("posX = " + location.x + " posY = " + location.y);
 					}
+					Room CurentRoom=data.getCurrentRoom();
+                    if (CurentRoom.getName()=="healer") {
+                    	if(data.isClickedInRoom(location.x, location.y, height, width)) {
+                            System.out.println("---------------------------------------");
+                            System.out.println("Healer Work");
+                            System.out.println("---------------------------------------");
+                    	}
+                    	else {
+                    		System.out.println("On clique à l'extérieur");
+                    	}
+                    }
 					var detectButton = data.clickOnButton(location.x, location.y, (int) (width - dimMapButton[0]),
 							dimMapButton[1], dimMapButton[0], dimMapButton[1] * 2);
 					// System.out.println(detectButton);
@@ -149,26 +164,92 @@ public class GameController {
 							break;
 						}
 					}
-						//System.out.println("floorCoordonnees : " + floorCoordonnees);
+					// System.out.println("floorCoordonnees : " + floorCoordonnees);
 					if (floorCoordonnees != null) {
-						//System.out.println(floorCoordonnees[0] + " " + floorCoordonnees[1] + " " + (int) floorCoordonnees[2] + " " + (int) floorCoordonnees[3]);
-						var detectRoom = data.clickOnMap(location.x, location.y, floorCoordonnees[0], floorCoordonnees[1], (int) floorCoordonnees[2], (int) floorCoordonnees[3]);
-						//System.out.println("detectRoom : " + detectRoom);
+						// System.out.println(floorCoordonnees[0] + " " + floorCoordonnees[1] + " " +
+						// (int) floorCoordonnees[2] + " " + (int) floorCoordonnees[3]);
+						var detectRoom = data.clickOnMap(location.x, location.y, floorCoordonnees[0],
+								floorCoordonnees[1], (int) floorCoordonnees[2], (int) floorCoordonnees[3]);
+						// System.out.println("detectRoom : " + detectRoom);
 						if (detectRoom != null) {
-							//System.out.println("detectRoom : " + detectRoom);
+							// System.out.println("detectRoom : " + detectRoom);
 							view.goToRoom(context, (int) height, (int) width, data, detectRoom);
+							if (data.getCurrentRoom().getName() == "corridor") {
+								var room = (Corridor) data.getCurrentRoom();
+								if (room.isThereMonster()) {
+									if (!room.areMonstersDead()) {
+										var monsters = room.getMonsters();
+										Monster monster1 = null;
+										Monster monster2 = null;
+										if (monsters.size() == 2) {
+											monster1 = monsters.get(1);
+											monster2 = monsters.get(0);
+										}
+										else {
+											monster1 = monsters.get(0);
+										}
+										monster1.setSelected(true);
+										//System.out.println("Je suis au dessus de la boucle while");
+										while (room.areMonstersDead() == false) {
+											//System.out.println("Je suis dans la boucle while\nVoici l'état des monsters de la salle : " + room.areMonstersDead());
+											event = context.pollOrWaitEvent((long) Math.pow(10, 8));
+											action = event.getAction();
+											if (action == Action.POINTER_DOWN) {
+												location = event.getLocation();
+												if (location != null) {
+													System.out.println("Localisation du clic : " + location.x + " | " + location.y);
+													var isItemHere = data.clickOnItem(location.x, location.y);
+													System.out.println("isItemHere : " + isItemHere);
+													if (isItemHere != null) {
+														Item clickedItem = (Item) isItemHere.values().toArray()[0];
+														Coordonnees clickedItemPos = (Coordonnees) isItemHere.keySet().toArray()[0];
+														if (data.isItemInInventory(clickedItem)) {
+															if (clickedItem.isWeapon()) {
+																data.getHero().equip((Weapon) clickedItem);
+																if (monster1.isSelected()) {
+																	data.getHero().attack(monster1);
+																	System.out.println("Les points de vies du monstre : " + monster1.health());
+																	view.drawCurrentRoom(context, (int) height, (int) width, data);
+																}
+																if (monster1.health() <= 0) {
+																	monster1.setSelected(false);
+																	if (monster2 != null) {
+																		monster2.setSelected(true);
+																	}
+																}
+																if (monster2 != null && monster2.isSelected()) {
+																	data.getHero().attack(monster2);
+																	view.drawCurrentRoom(context, (int) height, (int) width, data);
+																}
+																
+															}
+														}
+													}
+												}
+											}
+											if ((action == Action.KEY_PRESSED || action == Action.KEY_RELEASED) && event.getKey() == KeyboardKey.Q) {
+												context.exit(0);
+											}
+										}
+									}
+								}
+							}
 						}
 					}
-					var isItemHere = data.clickOnItem(location.x, location.y);
+					/*var isItemHere = data.clickOnItem(location.x, location.y);
 					if (isItemHere != null) {
-						System.out.println("----------------------------------------------------------------------------------------");
-						System.out.println("Les items présents dans l'interface AVANT le déplacement : " + data.getObjectsPosition());
-						System.out.println("----------------------------------------------------------------------------------------");
+						System.out.println(
+								"----------------------------------------------------------------------------------------");
+						System.out.println("Les items présents dans l'interface AVANT le déplacement : "
+								+ data.getObjectsPosition());
+						System.out.println(
+								"----------------------------------------------------------------------------------------");
 						Item clickedItem = (Item) isItemHere.values().toArray()[0];
 						Coordonnees clickedItemPos = (Coordonnees) isItemHere.keySet().toArray()[0];
-						//System.out.println("Le joueur a cliqué sur l'item : \n" + clickedItem);
+						// System.out.println("Le joueur a cliqué sur l'item : \n" + clickedItem);
 						view.drawItemSelector(context, clickedItemPos, clickedItem, data);
-						data.removeObjectPosition(clickedItem, clickedItemPos.x1(), clickedItemPos.y1(), clickedItemPos.x2(), clickedItemPos.y2());
+						data.removeObjectPosition(clickedItem, clickedItemPos.x1(), clickedItemPos.y1(),
+								clickedItemPos.x2(), clickedItemPos.y2());
 						boolean isItemSelected = true;
 						while (isItemSelected) {
 							event = context.pollOrWaitEvent((long) Math.pow(10, 8));
@@ -176,16 +257,16 @@ public class GameController {
 							if (action == Action.POINTER_DOWN) {
 								location = event.getLocation();
 								if (location != null) {
-									//data.addObjectPosition(clickedItem, clickedItemPos.x1(), clickedItemPos.y1(), clickedItemPos.x2(), clickedItemPos.y2());
+									// data.addObjectPosition(clickedItem, clickedItemPos.x1(), clickedItemPos.y1(),
+									// clickedItemPos.x2(), clickedItemPos.y2());
 									view.drawItem(context, location.x, location.y, clickedItem, data);
 									isItemSelected = false;
-									
+
 								}
 							}
 						}
-						
-						
-					}
+
+					}*/
 				}
 			}
 			if ((action == Action.KEY_PRESSED || action == Action.KEY_RELEASED) && event.getKey() == KeyboardKey.Q) {

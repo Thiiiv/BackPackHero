@@ -2,9 +2,11 @@ package fr.game.data.game;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,6 +69,9 @@ public class GameData {
 		stage1.add(2, 10, new Corridor(1));
 		stage1.add(4, 10, new Merchant());
 		stage1.getRoom(2, 0).setHeroHere(true);
+		/*for (var i : stage1.findShortestPath(actualStage, 0, 2, 3, 4)) {
+			System.out.println(i.getName());
+		}*/
 	}
 	
 	public Hero getHero() {
@@ -191,8 +196,10 @@ public class GameData {
 	public Room getCurrentRoom() {
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 11; j++) {
-				if (actualStage.getRoom(i, j).isHeroHere()) {
-					return actualStage.getRoom(i, j);
+				if (actualStage.getRoom(i, j) != null) {
+					if (actualStage.getRoom(i, j).isHeroHere()) {
+						return actualStage.getRoom(i, j);
+					}
 				}
 			}
 		}
@@ -200,20 +207,22 @@ public class GameData {
 	}
 	
 	public boolean setCurrentRoom(int x, int y) {
+		if (actualStage.getRoom(y, x) == null) {
+			return false;
+		}
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 11; j++) {
-				if (j != x && i != y) {
+				if (actualStage.getRoom(i, j) != null) {
 					if (actualStage.getRoom(i, j).isHeroHere()) {
 						actualStage.getRoom(i, j).setHeroHere(false);
 					}
 				}
-				else {
-					actualStage.getRoom(i, j).setHeroHere(true);
-					return true;
-				}
 			}
 		}
-		return false;
+		if (actualStage.getRoom(y, x) != null) {
+			actualStage.getRoom(y, x).setHeroHere(true);
+		}
+		return true;
 	}
 	
 	public HashMap<Coordonnees, Item> clickOnItem(float x, float y) {
@@ -225,6 +234,26 @@ public class GameData {
 		return null;
 	}
 	
+	public boolean isItemInInventory(Item item) {
+		if (inventaire.get(item) != null) {
+			return true;
+		}
+		return false;
+	}
 	
-	
+	public boolean isClickedInRoom(float clickX, float clickY,float height,float width) {
+        var loader = new ImageLoader("data", List.of(Path.of("hero-4.png").toString()));
+        float dimX = (float) (loader.image("hero-4.png").getWidth() * 1.5);
+        float dimY = (float) (loader.image("hero-4.png").getHeight() * 1.5);
+        float posX = (float) (width - (80 + dimX));
+        float posY = height - loader.image("hero-4.png").getHeight() * 2;
+        System.out.println("clickX : " + clickX + " clickY : " + clickY);
+        System.out.println("dimX : " + dimX + " dimY : " + dimY + " posX : " + posX + " posY : " + posY);
+        
+        if (clickX >= posX && clickX <= posX + dimX &&
+            clickY >= posY && clickY <= posY + dimY) {
+            return true;
+        }
+        return false; 
+    }
 }

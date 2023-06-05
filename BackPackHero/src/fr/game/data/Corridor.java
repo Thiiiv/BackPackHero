@@ -85,4 +85,17 @@ public class Corridor implements Room {
 	public void setHeroHere(boolean hereOrNot) {
 		isHeroHere = hereOrNot;
 	}
+	
+	public boolean areMonstersDead() {
+		if (this.isThereMonster()) {
+			var list = this.getMonsters();
+			for (var i : list) {
+				if (i.health() > 0) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 }
