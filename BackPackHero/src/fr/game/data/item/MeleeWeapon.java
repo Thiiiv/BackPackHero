@@ -43,6 +43,7 @@ public class MeleeWeapon implements Weapon{
 		return rarity;
 	}
 	
+	@Override
 	public int getEnergyPoint() {
 		return energyPoint;
 	}

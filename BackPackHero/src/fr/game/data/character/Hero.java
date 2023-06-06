@@ -13,10 +13,11 @@ public class Hero implements Character {
 	private Weapon equipedWeapon;
 	private int attackPoint;
 	private int gold;
+	private int energyPoint = 3;
 
 	
 	public Hero() {
-		name = "héros";
+		name = "hero";
 		maxHealth = 40;
 		health = 40;
 		defensePoint = 0;
@@ -52,7 +53,7 @@ public class Hero implements Character {
 		return maxHealth;
 	}
 	
-	public static void heal(int healAmount) {
+	public void heal(int healAmount) {
 		if ((health + healAmount) > maxHealth) {
 			health = maxHealth;
 		}
@@ -63,8 +64,9 @@ public class Hero implements Character {
 	}
 	
 	public void attack(Monster monster) { // add Monster argument
-		monster.getDamage(attackPoint);
-		
+		if (energyPoint - equipedWeapon.getEnergyPoint() >= 0) {
+			monster.getDamage(attackPoint);
+		}
 	}
 	
 	public boolean beAttacked(Monster monster) { // add Monster argument
@@ -73,18 +75,33 @@ public class Hero implements Character {
 
 	@Override
 	public void getDamage(int damage) {
-		if (health < damage) {
-			health = 0;
+		if (this.defensePoint <= 0) {
+			if (health < damage) {
+				health = 0;
+			}
+			else {
+				health -= damage;
+			}
 		}
 		else {
-			health -= damage;
+			var reste = Math.abs(defensePoint - damage);
+			if (health - reste < 0) {
+				health = 0;
+			}
+			else {
+				health -= reste;
+			}
 		}
+		
 		System.out.println("Le " + name + " a encaissé " + damage + " points de dégât."); 
 	}
 	
 	public void equip(Weapon weapon) {
 		equipedWeapon = weapon;
 		attackPoint = equipedWeapon.getAttackPoint();
+		if (weapon.getName() == "shield") {
+			
+		}
 	}
 	
 	public Item buy(Item item, Inventory inventory) {
@@ -117,4 +134,38 @@ public class Hero implements Character {
 	public String getCharacterImage() {
 		return "hero-4.png";
 	}
+	
+	public int getEnergyPoint() {
+		return energyPoint;
+	}
+	
+	public void resetEnergy() {
+		energyPoint = 3;
+	}
+	
+	public void addEnergy(int amount) {
+		energyPoint += amount;
+	}
+	
+	public void spendEnergy(int amount) {
+		if (energyPoint - amount <= 0) {
+			this.energyPoint = 0;
+		}
+		else {
+			System.out.println("EnergyPoint : " + energyPoint);
+			this.energyPoint -= amount;
+		}
+		
+	}
+	
+	@Override
+	public boolean isAlive() {
+		return (this.health() > 0);
+	}
+
+	@Override
+	public void Defend(int amount) {
+		
+	}
+	
 }

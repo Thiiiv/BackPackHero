@@ -6,4 +6,6 @@ public interface Character {
 	public void getDamage(int damage);
 	public boolean beAttacked(Character character);
 	public String getCharacterImage();
+	public boolean isAlive();
+	public void Defend(int amount);
 }

@@ -5,36 +5,30 @@ import java.util.Objects;
 
 public class Shield implements Weapon{
 
-	private final String name;
+	private final String name = "shield";
 	private final String rarity;
 	private int attackPoint;
 	private int energyPoint;
 	private int protectionPoint;
-	private final int[][] size = new int[2][1];
+	private final int[][] size = new int[2][2];
 	
 	
-	public Shield(String getName,String getRarity,int getAttackPoint,int getEnergyPoint,int getProtectionPoint){
-		this.name=Objects.requireNonNull(getName,"Give a name for the RangedWeapon");
-		this.rarity=Objects.requireNonNull(getRarity,"Give a rarity for the RangedWeapon");
-		this.attackPoint=getAttackPoint;
-		this.energyPoint=getAttackPoint;
-		this.protectionPoint=getProtectionPoint;
+	public Shield(String rarity, int energyPoint,int protectionPoint){
+		this.rarity=Objects.requireNonNull(rarity,"Give a rarity for the Shield");
+		this.energyPoint=energyPoint;
+		this.protectionPoint=protectionPoint;
 		
-		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
+		var list = List.of("Common", "Uncommon","Rare","Lengendary");
 		
-		if (rarity.contains(getRarity)==false) {
+		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
 		}
 		
-		if (getEnergyPoint<0) {
+		if (energyPoint<0) {
 			throw new IllegalArgumentException("getEnergyPoint cannot be negative");
 		}
 		
-		if (getAttackPoint>0) {
-			throw new IllegalArgumentException("your shield has attack point");
-		}
-		
-		if (getProtectionPoint<=0) {
+		if (protectionPoint<=0) {
 			throw new IllegalArgumentException("getProtectionPoint cannot be equal to zero or negative");
 		}
 		

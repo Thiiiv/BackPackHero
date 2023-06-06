@@ -1,18 +1,24 @@
 package fr.game.data.item;
 
+import java.util.List;
 import java.util.Objects;
 
 public class ManaStone implements Item {
 	
 	private int number = 0;
 	private String rarity;
-	private String name;
+	private String name = "manastone";
 	private final int[][] size = new int[2][1];
 
-	public ManaStone (String name ,int number, String rarity) {
+	public ManaStone (int number, String rarity) {
 		this.number = number;
-		this.rarity = rarity;
-		this.name = name;
+		this.rarity = Objects.requireNonNull(rarity, "La rareté de l'objet est incorrect");
+		
+		var list = List.of("Common", "Uncommon","Rare","Lengendary");
+		
+		if (list.contains(rarity)==false) {
+			throw new IllegalArgumentException("This Rarity don't exist");
+		}
 	}
 	
 	@Override

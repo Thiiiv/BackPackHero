@@ -2,7 +2,7 @@ package fr.game.data.character;
 
 public class RatWolf implements Monster{
 	
-	private final String name = "Rat-loup(s)";
+	private final String name = "ratWolf";
 	private int attackPoint=9;
 	private int defensePoint=16;
 	private int health = 45;
@@ -42,11 +42,22 @@ public class RatWolf implements Monster{
 	}
 	
 	public void getDamage(int damage) {
-		if (this.health - damage < 0) {
-			this.health = 0;
+		if (this.defensePoint <= 0) {
+			if (health < damage) {
+				health = 0;
+			}
+			else {
+				health -= damage;
+			}
 		}
 		else {
-			this.health -= damage;
+			var reste = Math.abs(defensePoint - damage);
+			if (health - reste < 0) {
+				health = 0;
+			}
+			else {
+				health -= reste;
+			}
 		}
 		 System.out.println("Le " + name + " a encaissé " + damage + " points de dégât.");
 	}
@@ -69,6 +80,11 @@ public class RatWolf implements Monster{
 	@Override
 	public void setSelected(boolean isOrNot) {
 		isSelected = isOrNot;
+	}
+	
+	@Override
+	public boolean isAlive() {
+		return (this.health() > 0);
 	}
 
 

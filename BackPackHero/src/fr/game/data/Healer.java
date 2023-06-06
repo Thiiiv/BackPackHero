@@ -29,8 +29,8 @@ public class Healer implements Room {
 		return catalog;
 	}
 	
-	public void heal() {
-		Hero.heal(25);
+	public void heal(Hero hero) {
+		hero.heal(25);
 	}
 	
 	public void improveHealth() {

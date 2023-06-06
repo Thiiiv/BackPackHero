@@ -1,5 +1,6 @@
 package fr.game.data.item;
 
+import java.util.List;
 import java.util.Objects;
 
 public class GoldCoins implements Item {
@@ -11,7 +12,13 @@ public class GoldCoins implements Item {
 
 	public GoldCoins (int amount, String rarity) {
 		this.amount = amount;
-		this.rarity = rarity;
+		this.rarity = Objects.requireNonNull(rarity, "La rareté ne peut être null");
+		
+		var list = List.of("Common", "Uncommon", "Rare", "Lengendary");
+		
+		if (list.contains(rarity)==false) {
+			throw new IllegalArgumentException("This Rarity don't exist");
+		}
 	}
 	
 	@Override

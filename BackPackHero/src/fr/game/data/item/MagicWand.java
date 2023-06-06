@@ -12,16 +12,16 @@ public class MagicWand implements Weapon{
 	private final int[][] size = new int[2][1];
 	
 	
-	public MagicWand(String name,String getRarity,int attackPoint,int energyPoint,int manaPoint){
+	public MagicWand(String name,String rarity,int attackPoint,int energyPoint,int manaPoint){
 		this.name=Objects.requireNonNull(name,"Give a name for the RangedWeapon");
-		this.rarity=Objects.requireNonNull(getRarity,"Give a rarity for the RangedWeapon");
+		this.rarity=Objects.requireNonNull(rarity,"Give a rarity for the RangedWeapon");
 		this.attackPoint=attackPoint;
 		this.energyPoint=energyPoint;
 		this.manaPoint=manaPoint;
 		
-		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
+		var list = List.of("Common", "Uncommon","Rare","Lengendary");
 		
-		if (rarity.contains(getRarity)==false) {
+		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
 		}
 		

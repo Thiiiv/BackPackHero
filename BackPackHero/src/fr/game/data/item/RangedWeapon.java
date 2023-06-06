@@ -4,30 +4,29 @@ import java.util.List;
 import java.util.Objects;
 
 public class RangedWeapon implements Weapon{
-	private final String name;
+	private final String name = "bow";
 	private final String rarity;
 	private int attackPoint;
 	private int energyPoint;
 	private final int[][] size = new int[2][1];
 	
 	
-	public RangedWeapon(String getName,String getRarity,int getAttackPoint,int getEnergyPoint){
-		this.name=Objects.requireNonNull(getName,"Give a name for the RangedWeapon");
-		this.rarity=Objects.requireNonNull(getRarity,"Give a rarity for the RangedWeapon");
-		this.attackPoint=getAttackPoint;
-		this.energyPoint=getAttackPoint;
+	public RangedWeapon(String rarity,int attackPoint,int energyPoint){
+		this.rarity=Objects.requireNonNull(rarity,"Give a rarity for the RangedWeapon");
+		this.attackPoint=attackPoint;
+		this.energyPoint=energyPoint;
 		
-		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
+		var list = List.of("Common", "Uncommon","Rare","Lengendary");
 		
-		if (rarity.contains(getRarity)==false) {
+		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
 		}
 		
-		if (getEnergyPoint<0) {
+		if (energyPoint<0) {
 			throw new IllegalArgumentException("getEnergyPoint cannot be negative");
 		}
 		
-		if (getAttackPoint<0) {
+		if (attackPoint<0) {
 			throw new IllegalArgumentException("your weapon make negative damage");
 		}
 		

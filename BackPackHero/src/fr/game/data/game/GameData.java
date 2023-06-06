@@ -256,4 +256,35 @@ public class GameData {
         }
         return false; 
     }
+	
+	public String clickOnMenuHealer(float clickX, float clickY, float width, float height) {
+        // Vérification pour le bouton "Heal 10 PV pour 5 coins"
+        float healButtonX = (width / 2) - 200;
+        float healButtonY = (height / 2) - 100;
+        float healButtonWidth = 400;
+        float healButtonHeight = 200;
+
+        if (clickX >= healButtonX && clickX <= healButtonX + healButtonWidth &&
+            clickY >= healButtonY && clickY <= healButtonY + healButtonHeight) {
+            //verification de coin à faire
+            this.hero.heal(25);
+            return "heal"; 
+        }
+
+        // Vérification pour le bouton "Non merci"
+        float noThanksButtonX = (width / 2) - 200;
+        float noThanksButtonY = (height / 2) + 120;
+        float noThanksButtonWidth = 400;
+        float noThanksButtonHeight = 100;
+        
+        System.out.println("\nclickX : " + clickX + " clickY : " + clickY);
+        System.out.println("Position du bouton : " + "x = " + noThanksButtonX + " y = " + noThanksButtonY + " x2 = " + (noThanksButtonX + noThanksButtonWidth) + " y2 = " + (noThanksButtonY + noThanksButtonHeight));
+
+        if (clickX >= noThanksButtonX && clickX <= noThanksButtonX + noThanksButtonWidth &&
+            clickY >= noThanksButtonY && clickY <= noThanksButtonY + noThanksButtonHeight) {
+            return "no-heal"; 
+        }
+
+        return "null"; 
+    }
 }

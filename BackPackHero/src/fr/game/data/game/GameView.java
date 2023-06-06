@@ -304,6 +304,10 @@ public record GameView(GameData data, ImageLoader loader) {
 		graphics.setFont(font);
 		graphics.drawString(data.getHero().health() + "/" + data.getHero().maxHealth(),
 				(posX + dimx) - font.getSize() * 3, posY + dimy + dimx / 8);
+		image = loader.image("energycost.png");
+		drawImage(graphics, image, posX-(image.getWidth()/4), posY-(image.getHeight()/2), image.getWidth(), image.getHeight());
+		var heroEnergy = data.getHero().getEnergyPoint();
+		graphics.drawString(data.getHero().getEnergyPoint() + "", posX+(image.getWidth()/5), posY+(image.getHeight()/7));
 	}
 
 	public void drawMonster(ApplicationContext context, int height, int width, GameData data, Monster... monster) {
@@ -406,6 +410,30 @@ public record GameView(GameData data, ImageLoader loader) {
 			break;
 		}
 	}
+	
+	public void drawMenuHealer(ApplicationContext context, float width, float height, GameData data) {
+        context.renderFrame(graphics -> {
+        graphics.setColor(Color.DARK_GRAY);
+        graphics.fill(new Rectangle2D.Float(width / 4, height / 4, (2 * width) / 4, (2 * height) / 4));
+        graphics.setColor(Color.BLACK);
+        Font font = new Font("Arial", Font.PLAIN, 30);
+        graphics.setFont(font);
+        graphics.drawString("Bonjour jeune aventurier", (width / 3), (height / 3));
+
+        // Bouton "Heal 25 PV pour 5 coins"
+        graphics.setColor(Color.GRAY);
+        graphics.fill(new RoundRectangle2D.Float((width / 2) - 200, (height / 2) - 100, 400, 200, 50, 50));
+        graphics.setColor(Color.BLACK);
+        graphics.drawString("Heal 25 PV pour 5 coins", (width / 2) - 190, (height / 2));
+
+        // Bouton "Non merci"
+        graphics.setColor(Color.GRAY);
+        graphics.fill(new RoundRectangle2D.Float((width / 2) - 200, (height / 2) + 120, 400, 100, 50, 50));
+        graphics.setColor(Color.BLACK);
+        graphics.drawString("Non merci", (width / 2) - 90, (height / 2) + 180);
+        });
+    }
+
 
 	public void draw(Graphics2D graphics, ApplicationContext context, GameData data) {
 		var screenInfo = context.getScreenInfo();

@@ -22,6 +22,7 @@ import fr.game.data.character.Monster;
 import fr.game.data.item.Item;
 import fr.game.data.item.MeleeWeapon;
 import fr.game.data.item.RangedWeapon;
+import fr.game.data.item.Shield;
 import fr.game.data.item.Weapon;
 import fr.umlv.zen5.Application;
 import fr.umlv.zen5.ApplicationContext;
@@ -45,7 +46,7 @@ public class GameController {
 			FloatControl volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
 			// Diminution du volume de la musique de fond de 25 décibels
 			volumeControl.setValue(volumeControl.getValue() - 25f);
-			var mute = true;
+			var mute = false;
 			if (mute) {
 				volumeControl.setValue(volumeControl.getMinimum());
 			}
@@ -84,15 +85,16 @@ public class GameController {
 		return list;
 	}
 
-	private static void backpackHero(ApplicationContext context) throws IOException {
+	private static void backpackHero(ApplicationContext context) throws IOException, InterruptedException {
 		var screenInfo = context.getScreenInfo();
 		var width = screenInfo.getWidth();
 		var height = screenInfo.getHeight();
 		var margin = 0;
 		var images = new ImageLoader("data", collectImages("data"));
 		var data = new GameData();
-		data.addItem(0, 0, new MeleeWeapon("Common", 10, 2));
-		data.addItem(0, 1, new RangedWeapon("bow", "Common", 10, 2));
+		data.addItem(0, 0, new MeleeWeapon("Common", 7, 1));
+		data.addItem(0, 1, new RangedWeapon("bow", "Common", 7, 1));
+		data.addItem(0, 2, new Shield("Shield", "Common", 0, 2, 10));
 		var view = GameView.initGameGraphics(margin, margin, (int) Math.min(width, height) - 2 * margin, data, images);
 		GameView.draw(context, data, view);
 		var dimMapButton = view.getMapButtonsize();
@@ -145,6 +147,25 @@ public class GameController {
                             System.out.println("---------------------------------------");
                             System.out.println("Healer Work");
                             System.out.println("---------------------------------------");
+                            view.drawMenuHealer(context,width,height, data);
+                            while(true){
+                                event = context.pollOrWaitEvent((long) Math.pow(10, 8));
+                                if (event == null) {
+                                    continue;
+                                }
+                                action = event.getAction();
+                                if (action == Action.POINTER_DOWN) {
+                                    location = event.getLocation();
+                                    if (location != null) {
+                                    	System.out.println("location : " + " x = " + location.x + " y = " + location.y);
+                                    	var clickOnMenuHealer = data.clickOnMenuHealer(location.x, location.y, width, height);
+                                        if(clickOnMenuHealer != null){
+                                            view.drawCurrentRoom(context, (int) height, (int) width, data);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
                     	}
                     	else {
                     		System.out.println("On clique à l'extérieur");
@@ -190,6 +211,7 @@ public class GameController {
 										}
 										monster1.setSelected(true);
 										//System.out.println("Je suis au dessus de la boucle while");
+										var tour = "hero";
 										while (room.areMonstersDead() == false) {
 											//System.out.println("Je suis dans la boucle while\nVoici l'état des monsters de la salle : " + room.areMonstersDead());
 											event = context.pollOrWaitEvent((long) Math.pow(10, 8));
@@ -206,10 +228,15 @@ public class GameController {
 														if (data.isItemInInventory(clickedItem)) {
 															if (clickedItem.isWeapon()) {
 																data.getHero().equip((Weapon) clickedItem);
-																if (monster1.isSelected()) {
+																if (tour == "hero" && monster1.isSelected() && ((Weapon) clickedItem).getName() != "shield") {
 																	data.getHero().attack(monster1);
+																	System.out.println("Energie dépensé pour le monstre 1 : " + ((Weapon) clickedItem).getEnergyPoint());
+																	data.getHero().spendEnergy(((Weapon) clickedItem).getEnergyPoint());
 																	System.out.println("Les points de vies du monstre : " + monster1.health());
 																	view.drawCurrentRoom(context, (int) height, (int) width, data);
+																	if (data.getHero().getEnergyPoint() > 0) {
+																		continue;
+																	}
 																}
 																if (monster1.health() <= 0) {
 																	monster1.setSelected(false);
@@ -217,20 +244,41 @@ public class GameController {
 																		monster2.setSelected(true);
 																	}
 																}
-																if (monster2 != null && monster2.isSelected()) {
+																if (tour == "hero" && monster2 != null && monster2.isSelected()) {
+																	Thread.sleep(Duration.ofMillis(600));
 																	data.getHero().attack(monster2);
+																	System.out.println("Energie dépensé pour le monstre 2 : " + ((Weapon) clickedItem).getEnergyPoint());
+																	data.getHero().spendEnergy(((Weapon) clickedItem).getEnergyPoint());
 																	view.drawCurrentRoom(context, (int) height, (int) width, data);
 																}
-																
+																if (data.getHero().getEnergyPoint() == 0) {
+																	tour = "monster";
+																	data.getHero().resetEnergy();
+																}
 															}
 														}
 													}
 												}
 											}
+											if (tour == "monster") {
+												System.out.println("\nJe suis dans la condition de la tour des monstres\n");
+												if (monster1.isAlive()) {
+													Thread.sleep(Duration.ofMillis(600));
+													monster1.attack(data.getHero());
+													view.drawCurrentRoom(context, (int) height, (int) width, data);
+												}
+												if (monster2 != null && monster2.isAlive()) {
+													Thread.sleep(Duration.ofMillis(600));
+													monster2.attack(data.getHero());
+													view.drawCurrentRoom(context, (int) height, (int) width, data);
+												}
+												tour = "hero";
+											}
 											if ((action == Action.KEY_PRESSED || action == Action.KEY_RELEASED) && event.getKey() == KeyboardKey.Q) {
 												context.exit(0);
 											}
 										}
+										data.getHero().resetEnergy();
 									}
 								}
 							}
@@ -283,6 +331,9 @@ public class GameController {
 			try {
 				backpackHero(t);
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

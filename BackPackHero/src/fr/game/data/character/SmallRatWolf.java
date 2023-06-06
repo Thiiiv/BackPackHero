@@ -42,8 +42,24 @@ public class SmallRatWolf implements Monster{
 	}
 	
 	public void getDamage(int damage) {
-		this.health -= damage;
-		 System.out.println("Le " + name + " a encaissé " + damage + " points de dégât.");
+		if (this.defensePoint <= 0) {
+			if (health < damage) {
+				health = 0;
+			}
+			else {
+				health -= damage;
+			}
+		}
+		else {
+			var reste = Math.abs(defensePoint - damage);
+			if (health - reste < 0) {
+				health = 0;
+			}
+			else {
+				health -= reste;
+			}
+		}
+		System.out.println("Le " + name + " a encaissé " + damage + " points de dégât.");
 	}
 
 	@Override
@@ -64,5 +80,10 @@ public class SmallRatWolf implements Monster{
 	@Override
 	public void setSelected(boolean isOrNot) {
 		isSelected = isOrNot;
+	}
+	
+	@Override
+	public boolean isAlive() {
+		return (this.health() > 0);
 	}
 }
