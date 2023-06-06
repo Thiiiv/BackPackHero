@@ -4,7 +4,7 @@ public class RatWolf implements Monster{
 	
 	private final String name = "ratWolf";
 	private int attackPoint=9;
-	private int defensePoint=16;
+	private int defensePoint=0;
 	private int health = 45;
 	private int maxHealth = 45;
 	private boolean isSelected = false;
@@ -85,6 +85,17 @@ public class RatWolf implements Monster{
 	@Override
 	public boolean isAlive() {
 		return (this.health() > 0);
+	}
+
+	@Override
+	public void defend() {
+		this.defensePoint += 16;
+	}
+	
+	@Override
+	public void resetDefense() {
+		this.defensePoint = 0;
+		
 	}
 
 

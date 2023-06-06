@@ -54,16 +54,19 @@ public record GameView(GameData data, ImageLoader loader) {
 	}
 
 	public void drawMenu(Graphics2D graphics, int width, int height, GameData data) {
-		graphics.setColor(Color.ORANGE);
-		graphics.fill(new Rectangle2D.Float(0, 0, height, width));
-		graphics.setColor(Color.RED);
-		graphics.fill(new RoundRectangle2D.Float((height / 2) - 525, (width / 2) - 100, 500, 200, 50, 50));
-		graphics.fill(new RoundRectangle2D.Float((height / 2) + 25, (width / 2) - 100, 500, 200, 50, 50));
+		drawImage(graphics, loader.image("main.png"), 0,0, height, width);
+		graphics.setColor(new Color(170, 127, 95, 255));
+		graphics.fill(new RoundRectangle2D.Float((height / 2) - 525, (width - 250), 500, 100, 30, 30));
+		graphics.fill(new RoundRectangle2D.Float((height / 2) + 25, (width - 250), 500, 100, 30, 30));
+		graphics.setStroke(new BasicStroke(4.0f));
 		graphics.setColor(Color.BLACK);
-		Font font = new Font("Arial", Font.PLAIN, 40); // Crée une police Arial, de style normal et de taille 12
+		graphics.draw(new RoundRectangle2D.Float((height / 2) - 525, (width - 250), 500, 100, 30, 30));
+		graphics.draw(new RoundRectangle2D.Float((height / 2) + 25, (width - 250), 500, 100, 30, 30));
+		graphics.setColor(Color.WHITE);
+		Font font = new Font("Lucida Sans", Font.BOLD, 25);
 		graphics.setFont(font);
-		graphics.drawString("Jouer", (height / 2) - 315, (width / 2));
-		graphics.drawString("Quitter", (height / 2) + 215, (width / 2));
+		graphics.drawString("Jouer", (height / 2) - 315, (width - 190));
+		graphics.drawString("Quitter", (height / 2) + 240, (width - 190));
 	}
 
 	public void drawRoomOnMap(Graphics2D graphics, float dimX, float dimY, float posX, float posY, Room room) {
@@ -146,14 +149,14 @@ public record GameView(GameData data, ImageLoader loader) {
 	public int[] getMenuButtonPosition(float width, float height) {
 		int[] dimensions = new int[2];
 		dimensions[0] = (int) (height / 2) - 525;
-		dimensions[1] = (int) (width / 2) - 100;
+		dimensions[1] = (int) (width - 250);
 		return dimensions;
 	}
 
 	public int[] getExitButtonPosition(float width, float height) {
 		int[] dimensions = new int[2];
 		dimensions[0] = (int) (height / 2) + 25;
-		dimensions[1] = (int) (width / 2) - 100;
+		dimensions[1] = (int) (width - 250);
 		return dimensions;
 	}
 
@@ -170,7 +173,7 @@ public record GameView(GameData data, ImageLoader loader) {
 				drawImage(graphics, image, posX, posY, dimX, dimY);
 				dimX = 40;
 				dimY = 40;
-				posX *= 1.75;
+				posX *= 2;
 				posY = ((height / 2) / 2) - (float) (dimY * 1.5);
 				// System.out.println("posX : " + posX + " posY : " + posY);
 				for (var i = 0; i < 11; i++) {
@@ -304,10 +307,14 @@ public record GameView(GameData data, ImageLoader loader) {
 		graphics.setFont(font);
 		graphics.drawString(data.getHero().health() + "/" + data.getHero().maxHealth(),
 				(posX + dimx) - font.getSize() * 3, posY + dimy + dimx / 8);
-		image = loader.image("energycost.png");
+		image = loader.image("energy.png");
 		drawImage(graphics, image, posX-(image.getWidth()/4), posY-(image.getHeight()/2), image.getWidth(), image.getHeight());
 		var heroEnergy = data.getHero().getEnergyPoint();
 		graphics.drawString(data.getHero().getEnergyPoint() + "", posX+(image.getWidth()/5), posY+(image.getHeight()/7));
+		if (data.getHero().defensePoint() != 0) {
+			image = loader.image("protection.png");
+			drawImage(graphics, image, (float) healthBar.getX() - (image.getWidth()/4), (float) healthBar.getY() - (image.getHeight()/4), image.getWidth()/1.5f, image.getHeight()/1.5f);
+		}
 	}
 
 	public void drawMonster(ApplicationContext context, int height, int width, GameData data, Monster... monster) {

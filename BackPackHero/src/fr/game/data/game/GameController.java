@@ -93,8 +93,8 @@ public class GameController {
 		var images = new ImageLoader("data", collectImages("data"));
 		var data = new GameData();
 		data.addItem(0, 0, new MeleeWeapon("Common", 7, 1));
-		data.addItem(0, 1, new RangedWeapon("bow", "Common", 7, 1));
-		data.addItem(0, 2, new Shield("Shield", "Common", 0, 2, 10));
+		data.addItem(0, 1, new RangedWeapon("Common", 7, 1));
+		data.addItem(0, 2, new Shield("Common", 1, 10));
 		var view = GameView.initGameGraphics(margin, margin, (int) Math.min(width, height) - 2 * margin, data, images);
 		GameView.draw(context, data, view);
 		var dimMapButton = view.getMapButtonsize();
@@ -212,6 +212,7 @@ public class GameController {
 										monster1.setSelected(true);
 										//System.out.println("Je suis au dessus de la boucle while");
 										var tour = "hero";
+										Weapon clickedWeapon;
 										while (room.areMonstersDead() == false) {
 											//System.out.println("Je suis dans la boucle while\nVoici l'état des monsters de la salle : " + room.areMonstersDead());
 											event = context.pollOrWaitEvent((long) Math.pow(10, 8));
@@ -227,11 +228,18 @@ public class GameController {
 														Coordonnees clickedItemPos = (Coordonnees) isItemHere.keySet().toArray()[0];
 														if (data.isItemInInventory(clickedItem)) {
 															if (clickedItem.isWeapon()) {
-																data.getHero().equip((Weapon) clickedItem);
-																if (tour == "hero" && monster1.isSelected() && ((Weapon) clickedItem).getName() != "shield") {
-																	data.getHero().attack(monster1);
-																	System.out.println("Energie dépensé pour le monstre 1 : " + ((Weapon) clickedItem).getEnergyPoint());
-																	data.getHero().spendEnergy(((Weapon) clickedItem).getEnergyPoint());
+																clickedWeapon = (Weapon) clickedItem;
+																data.getHero().equip(clickedWeapon);
+																System.out.println("\nJ'ai cliqué sur une Item de type Weapon\n");
+																if (tour == "hero" && monster1.isSelected()) {
+																	if (clickedWeapon.getName() != "shield") {
+																		data.getHero().attack(monster1);
+																	}
+																	else if (clickedWeapon.getName() == "shield") {
+																		System.out.println("\nJe défend\n");
+																		data.getHero().defend();
+																	}
+																	System.out.println("Energie dépensé pour le monstre 1 : " + clickedWeapon.getEnergyPoint());
 																	System.out.println("Les points de vies du monstre : " + monster1.health());
 																	view.drawCurrentRoom(context, (int) height, (int) width, data);
 																	if (data.getHero().getEnergyPoint() > 0) {
@@ -246,9 +254,14 @@ public class GameController {
 																}
 																if (tour == "hero" && monster2 != null && monster2.isSelected()) {
 																	Thread.sleep(Duration.ofMillis(600));
-																	data.getHero().attack(monster2);
-																	System.out.println("Energie dépensé pour le monstre 2 : " + ((Weapon) clickedItem).getEnergyPoint());
-																	data.getHero().spendEnergy(((Weapon) clickedItem).getEnergyPoint());
+																	if (clickedWeapon.getName() != "shield") {
+																		data.getHero().attack(monster1);
+																	}
+																	else if (clickedWeapon.getName() == "shield") {
+																		System.out.println("\nJe défend\n");
+																		data.getHero().defend();
+																	}
+																	System.out.println("Energie dépensé pour le monstre 2 : " + clickedWeapon.getEnergyPoint());
 																	view.drawCurrentRoom(context, (int) height, (int) width, data);
 																}
 																if (data.getHero().getEnergyPoint() == 0) {
@@ -273,6 +286,7 @@ public class GameController {
 													view.drawCurrentRoom(context, (int) height, (int) width, data);
 												}
 												tour = "hero";
+												data.getHero().resetDefense();
 											}
 											if ((action == Action.KEY_PRESSED || action == Action.KEY_RELEASED) && event.getKey() == KeyboardKey.Q) {
 												context.exit(0);

@@ -1,6 +1,7 @@
 package fr.game.data.character;
 
 import fr.game.data.item.Item;
+import fr.game.data.item.Shield;
 import fr.game.data.item.Weapon;
 import fr.game.data.Inventory;
 
@@ -66,6 +67,7 @@ public class Hero implements Character {
 	public void attack(Monster monster) { // add Monster argument
 		if (energyPoint - equipedWeapon.getEnergyPoint() >= 0) {
 			monster.getDamage(attackPoint);
+			this.spendEnergy(equipedWeapon.getEnergyPoint());
 		}
 	}
 	
@@ -84,12 +86,15 @@ public class Hero implements Character {
 			}
 		}
 		else {
-			var reste = Math.abs(defensePoint - damage);
-			if (health - reste < 0) {
-				health = 0;
-			}
-			else {
-				health -= reste;
+			var reste = defensePoint - damage;
+			System.out.println("LE RESTE DE LA SOUSTRACTION : " + reste);
+			if (reste < 0) {
+				if (health - Math.abs(reste) < 0) {
+					health = 0;
+				}
+				else {
+					health -= Math.abs(reste);
+				}
 			}
 		}
 		
@@ -99,9 +104,6 @@ public class Hero implements Character {
 	public void equip(Weapon weapon) {
 		equipedWeapon = weapon;
 		attackPoint = equipedWeapon.getAttackPoint();
-		if (weapon.getName() == "shield") {
-			
-		}
 	}
 	
 	public Item buy(Item item, Inventory inventory) {
@@ -162,9 +164,19 @@ public class Hero implements Character {
 	public boolean isAlive() {
 		return (this.health() > 0);
 	}
+	
+	@Override
+	public void defend() {
+		if (equipedWeapon.getName() == "shield") {
+			var shield = (Shield) equipedWeapon;
+			this.defensePoint += shield.getProtectionPoint();
+			this.spendEnergy(shield.getEnergyPoint());
+		}
+	}
 
 	@Override
-	public void Defend(int amount) {
+	public void resetDefense() {
+		this.defensePoint = 0;
 		
 	}
 	

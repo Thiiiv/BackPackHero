@@ -126,6 +126,6 @@ public class Shield implements Weapon{
 	
 	@Override
 	public boolean isWeapon() {
-		return false;
+		return true;
 	}
 }
