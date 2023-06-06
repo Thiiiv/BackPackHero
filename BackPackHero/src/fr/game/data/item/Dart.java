@@ -4,25 +4,24 @@ import java.util.List;
 import java.util.Objects;
 
 public class Dart implements Weapon{
-	private final String name;
+	private final String name="Dart";
 	private final String rarity;
 	private int attackPoint;
 	private int energyPoint;
 	private int usage;
 	private final int[][] size = new int[2][1];
 	
-	public Dart(String getName,String getRarity,int getAttackPoint,int getEnergyPoint, int usage) {
-		this.name=Objects.requireNonNull(getName,"Give a name for the dart");
-		this.rarity=Objects.requireNonNull(getRarity,"Give a rarity for the dart");
+	public Dart(String rarity,int getAttackPoint,int getEnergyPoint, int usage) {
+		this.rarity=Objects.requireNonNull(rarity,"Give a rarity for the dart");
 		this.attackPoint=getAttackPoint;
-		this.energyPoint=getAttackPoint;
+		this.energyPoint=getEnergyPoint;
 		this.usage=usage;
 		
-		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
-		
-		if (rarity.contains(getRarity)==false) {
+		var list = List.of("Common", "Uncommon","Rare","Lengendary");
+        
+		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
-		}
+	    }
 		
 		if (getEnergyPoint<0||getEnergyPoint>0) {
 			throw new IllegalArgumentException("getEnergyPoint have to be 0");

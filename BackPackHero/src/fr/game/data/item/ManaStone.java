@@ -7,18 +7,18 @@ public class ManaStone implements Item {
 	
 	private int number = 0;
 	private String rarity;
-	private String name = "manastone";
+	private String name="manastone";
 	private final int[][] size = new int[2][1];
 
 	public ManaStone (int number, String rarity) {
 		this.number = number;
-		this.rarity = Objects.requireNonNull(rarity, "La rareté de l'objet est incorrect");
+		this.rarity = Objects.requireNonNull(rarity,"Give a rarity for the manastone");
 		
 		var list = List.of("Common", "Uncommon","Rare","Lengendary");
-		
+        
 		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
-		}
+	    }
 	}
 	
 	@Override

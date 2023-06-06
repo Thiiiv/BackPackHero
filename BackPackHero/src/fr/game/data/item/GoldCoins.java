@@ -12,14 +12,15 @@ public class GoldCoins implements Item {
 
 	public GoldCoins (int amount, String rarity) {
 		this.amount = amount;
-		this.rarity = Objects.requireNonNull(rarity, "La rareté ne peut être null");
+		this.rarity = Objects.requireNonNull(rarity,"Give a rarity for the goldcoins");
 		
-		var list = List.of("Common", "Uncommon", "Rare", "Lengendary");
-		
+		var list = List.of("Common", "Uncommon","Rare","Lengendary");
+        
 		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
-		}
+	    }
 	}
+	
 	
 	@Override
 	public String getName() {

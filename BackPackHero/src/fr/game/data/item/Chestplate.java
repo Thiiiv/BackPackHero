@@ -4,24 +4,23 @@ import java.util.List;
 import java.util.Objects;
 
 public class Chestplate implements Armor{
-	private final String name;
+	private final String name="Chestplate";
 	private final String rarity;
 	private int defensePoint;
 	private final int[][] size = new int[2][1];
 	
-	public Chestplate(String getName,String getRarity,int getDefensePoint) {
-		this.name=Objects.requireNonNull(getName,"Give a name for the ChestPlate");
-		this.rarity=Objects.requireNonNull(getRarity,"Give a rarity for the ChestPlate");
+	public Chestplate(String rarity,int getDefensePoint) {
+		this.rarity=Objects.requireNonNull(rarity,"Give a rarity for the ChestPlate");
 		this.defensePoint=getDefensePoint;
 	
-		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
-	
-		if (rarity.contains(getRarity)==false) {
+		var list = List.of("Common", "Uncommon","Rare","Lengendary");
+        
+		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
-		}
+	    }
 		
 		if (getDefensePoint<0) {
-			throw new IllegalArgumentException("Your " + getName + "has negative defense point.");
+			throw new IllegalArgumentException("Your " + name + "has negative defense point.");
 		}	
 	}
 	

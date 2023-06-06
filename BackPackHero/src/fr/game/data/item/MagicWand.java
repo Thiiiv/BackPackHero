@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class MagicWand implements Weapon{
-	private final String name;
+	private final String name="magicWand";
 	private final String rarity;
 	private int attackPoint;
 	private int energyPoint;
@@ -12,18 +12,17 @@ public class MagicWand implements Weapon{
 	private final int[][] size = new int[2][1];
 	
 	
-	public MagicWand(String name,String rarity,int attackPoint,int energyPoint,int manaPoint){
-		this.name=Objects.requireNonNull(name,"Give a name for the RangedWeapon");
+	public MagicWand(String rarity,int attackPoint,int energyPoint,int manaPoint){
 		this.rarity=Objects.requireNonNull(rarity,"Give a rarity for the RangedWeapon");
 		this.attackPoint=attackPoint;
 		this.energyPoint=energyPoint;
 		this.manaPoint=manaPoint;
 		
 		var list = List.of("Common", "Uncommon","Rare","Lengendary");
-		
+        
 		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
-		}
+	    }
 		
 		if (energyPoint>0) {
 			throw new IllegalArgumentException("energyPoint cannot be superior to 0");

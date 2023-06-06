@@ -5,30 +5,35 @@ import java.util.Objects;
 
 public class Shield implements Weapon{
 
-	private final String name = "shield";
+	private final String name="shield";
 	private final String rarity;
 	private int attackPoint;
 	private int energyPoint;
 	private int protectionPoint;
-	private final int[][] size = new int[2][2];
+	private final int[][] size = new int[2][1];
 	
 	
-	public Shield(String rarity, int energyPoint,int protectionPoint){
+	public Shield(String rarity,int getAttackPoint,int getEnergyPoint,int getProtectionPoint){
 		this.rarity=Objects.requireNonNull(rarity,"Give a rarity for the Shield");
-		this.energyPoint=energyPoint;
-		this.protectionPoint=protectionPoint;
+		this.attackPoint=getAttackPoint;
+		this.energyPoint=getEnergyPoint;
+		this.protectionPoint=getProtectionPoint;
 		
 		var list = List.of("Common", "Uncommon","Rare","Lengendary");
-		
+	        
 		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
-		}
+	    }
 		
-		if (energyPoint<0) {
+		if (getEnergyPoint<0) {
 			throw new IllegalArgumentException("getEnergyPoint cannot be negative");
 		}
 		
-		if (protectionPoint<=0) {
+		if (getAttackPoint>0) {
+			throw new IllegalArgumentException("your shield has attack point");
+		}
+		
+		if (getProtectionPoint<=0) {
 			throw new IllegalArgumentException("getProtectionPoint cannot be equal to zero or negative");
 		}
 		
@@ -126,6 +131,6 @@ public class Shield implements Weapon{
 	
 	@Override
 	public boolean isWeapon() {
-		return true;
+		return false;
 	}
 }

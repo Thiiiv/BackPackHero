@@ -11,17 +11,16 @@ public class MeleeWeapon implements Weapon{
 	private final int[][] size = new int[2][1];
 	
 	
-	public MeleeWeapon(String getRarity,int getAttackPoint,int getEnergyPoint){
-		//this.getName=Objects.requireNonNull("Wooden Sword","Give a name for the meleeWeapon");
-		this.rarity=Objects.requireNonNull(getRarity,"Give a rarity for the meleeWeapon");
+	public MeleeWeapon(String rarity,int getAttackPoint,int getEnergyPoint){
+		this.rarity=Objects.requireNonNull(rarity,"Give a rarity for the meleeWeapon");
 		this.attackPoint=getAttackPoint;
 		this.energyPoint=getEnergyPoint;
 		
-		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
-		
-		if (rarity.contains(getRarity)==false) {
+		var list = List.of("Common", "Uncommon","Rare","Lengendary");
+        
+		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
-		}
+	    }
 		
 		if (getEnergyPoint<0) {
 			throw new IllegalArgumentException("EnergyPoint cannot be negative");
@@ -43,7 +42,6 @@ public class MeleeWeapon implements Weapon{
 		return rarity;
 	}
 	
-	@Override
 	public int getEnergyPoint() {
 		return energyPoint;
 	}

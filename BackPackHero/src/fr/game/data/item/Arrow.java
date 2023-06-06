@@ -5,25 +5,24 @@ import java.util.Objects;
 
 public class Arrow implements Weapon{
 	
-	private final String name;
+	private final String name="arrow";
 	private final String rarity;
 	private int attackPoint;
 	private int energyPoint;
 	private int usage;
 	private final int[][] size = new int[2][1];
 	
-	public Arrow(String getName,String getRarity,int getAttackPoint,int getEnergyPoint, int usage) {
-		this.name=Objects.requireNonNull(getName,"Give a name for the Arrow");
-		this.rarity=Objects.requireNonNull(getRarity,"Give a rarity for the Arrow");
+	public Arrow(String rarity,int getAttackPoint,int getEnergyPoint, int usage) {
+		this.rarity=Objects.requireNonNull(rarity,"Give a rarity for the Arrow");
 		this.attackPoint=getAttackPoint;
-		this.energyPoint=getAttackPoint;
+		this.energyPoint=getEnergyPoint;
 		this.usage=usage;
 		
-		var rarity = List.of("Common", "Uncommon","Rare","Lengendary");
-		
-		if (rarity.contains(getRarity)==false) {
+		var list = List.of("Common", "Uncommon","Rare","Lengendary");
+        
+		if (list.contains(rarity)==false) {
 			throw new IllegalArgumentException("This Rarity don't exist");
-		}
+	    }
 		
 		if (getEnergyPoint<0||getEnergyPoint>0) {
 			throw new IllegalArgumentException("getEnergyPoint have to be 0");
