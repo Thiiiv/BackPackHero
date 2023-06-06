@@ -29,11 +29,14 @@ import fr.umlv.zen5.ApplicationContext;
 import fr.umlv.zen5.Event.Action;
 import fr.umlv.zen5.KeyboardKey;
 
+/**
+ * Controls the game flow and handles user input.
+ */
 public class GameController {
-
-	public GameController() {
-	}
-
+	
+	/**
+     * Plays the game background music.
+     */
 	private static void playMusic() {
 		try {
 
@@ -56,7 +59,15 @@ public class GameController {
 			e.printStackTrace();
 		}
 	}
-
+	
+	 /**
+     * The main game loop that processes user input and controls the game flow.
+     *
+     * @param context The application context.
+     * @param data    The game data.
+     * @param view    The game view.
+     * @return true to continue the game loop, false to exit the game.
+     */
 	private static boolean gameLoop(ApplicationContext context, GameData data, GameView view) {
 		var event = context.pollOrWaitEvent(1000000);
 		if (event == null) {
@@ -69,13 +80,28 @@ public class GameController {
 		return true;
 
 	}
-
+	
+	 /**
+     * Checks if a value is within the specified range.
+     *
+     * @param min   The minimum value of the range.
+     * @param value The value to check.
+     * @param max   The maximum value of the range.
+     * @throws IllegalArgumentException if the value is outside the specified range.
+     */
 	private static void checkRange(double min, double value, double max) {
 		if (value < min || value > max) {
 			throw new IllegalArgumentException("Invalid coordinate: " + value);
 		}
 	}
-
+	
+	 /**
+     * Collects the names of image files in a directory.
+     *
+     * @param dir The directory to search for image files.
+     * @return A list of image file names in the directory.
+     * @throws IOException if an I/O error occurs while reading the directory.
+     */
 	private static List<String> collectImages(String dir) throws IOException {
 		var list = new ArrayList<String>();
 		var input = Files.newDirectoryStream(Path.of(dir));
@@ -177,13 +203,18 @@ public class GameController {
 					if (detectButton != null) {
 						switch (detectButton) {
 						case "mapButton":
+							System.out.println("Il faut dessiner le bouton map");
+							System.out.println("Voici les états des boutons : InventoryButton = " + data.getInventoryState() + " MapButton = " + data.getMapState());
 							floorCoordonnees = view.drawMap(context, (int) height, (int) width, data);
 							view.drawInventoryButton(context, (int) height, (int) width, data);
 							break;
 						case "inventoryButton":
+							System.out.println("Il faut dessiner le bouton inventaire");
+							System.out.println("Voici les états des boutons : InventoryButton = " + data.getInventoryState() + " MapButton = " + data.getMapState());
 							GameView.draw(context, data, view);
 							break;
 						}
+						data.changeButtonsState();
 					}
 					// System.out.println("floorCoordonnees : " + floorCoordonnees);
 					if (floorCoordonnees != null) {
@@ -231,9 +262,23 @@ public class GameController {
 																clickedWeapon = (Weapon) clickedItem;
 																data.getHero().equip(clickedWeapon);
 																System.out.println("\nJ'ai cliqué sur une Item de type Weapon\n");
-																if (tour == "hero" && monster1.isSelected()) {
+																if (monster1.health() <= 0) {
+																	System.out.println("-----------------------------------------\nLe premier monstre est mort\n-----------------------------------------");
+																	monster1.setSelected(false);
+																	if (monster2 != null) {
+																		monster2.setSelected(true);
+																	}
+																}
+																if (tour == "hero") {
 																	if (clickedWeapon.getName() != "shield") {
-																		data.getHero().attack(monster1);
+																		if (monster1.isSelected()) {
+																			data.getHero().attack(monster1);
+																		}
+																		if (monster2 != null) {
+																			if (monster2.isSelected()) {
+																				data.getHero().attack(monster2);
+																			}
+																		}
 																	}
 																	else if (clickedWeapon.getName() == "shield") {
 																		System.out.println("\nJe défend\n");
@@ -242,27 +287,12 @@ public class GameController {
 																	System.out.println("Energie dépensé pour le monstre 1 : " + clickedWeapon.getEnergyPoint());
 																	System.out.println("Les points de vies du monstre : " + monster1.health());
 																	view.drawCurrentRoom(context, (int) height, (int) width, data);
+																	if (room.areMonstersDead() == true) {
+																		break;
+																	}
 																	if (data.getHero().getEnergyPoint() > 0) {
 																		continue;
 																	}
-																}
-																if (monster1.health() <= 0) {
-																	monster1.setSelected(false);
-																	if (monster2 != null) {
-																		monster2.setSelected(true);
-																	}
-																}
-																if (tour == "hero" && monster2 != null && monster2.isSelected()) {
-																	Thread.sleep(Duration.ofMillis(600));
-																	if (clickedWeapon.getName() != "shield") {
-																		data.getHero().attack(monster1);
-																	}
-																	else if (clickedWeapon.getName() == "shield") {
-																		System.out.println("\nJe défend\n");
-																		data.getHero().defend();
-																	}
-																	System.out.println("Energie dépensé pour le monstre 2 : " + clickedWeapon.getEnergyPoint());
-																	view.drawCurrentRoom(context, (int) height, (int) width, data);
 																}
 																if (data.getHero().getEnergyPoint() == 0) {
 																	tour = "monster";
@@ -276,12 +306,12 @@ public class GameController {
 											if (tour == "monster") {
 												System.out.println("\nJe suis dans la condition de la tour des monstres\n");
 												if (monster1.isAlive()) {
-													Thread.sleep(Duration.ofMillis(600));
+													Thread.sleep(600);
 													monster1.attack(data.getHero());
 													view.drawCurrentRoom(context, (int) height, (int) width, data);
 												}
 												if (monster2 != null && monster2.isAlive()) {
-													Thread.sleep(Duration.ofMillis(600));
+													Thread.sleep(600);
 													monster2.attack(data.getHero());
 													view.drawCurrentRoom(context, (int) height, (int) width, data);
 												}
@@ -293,6 +323,7 @@ public class GameController {
 											}
 										}
 										data.getHero().resetEnergy();
+										data.getHero().resetDefense();
 									}
 								}
 							}
@@ -334,12 +365,17 @@ public class GameController {
 			if ((action == Action.KEY_PRESSED || action == Action.KEY_RELEASED) && event.getKey() == KeyboardKey.Q) {
 				context.exit(0);
 			}
-			// System.out.println("MapButtonState : " + data.getMapButtonState());
+			// System.out.println("MapButtonState : " + data.getMapState());
 			// System.out.println("InventoryButtonState : " +
-			// data.getInventoryButtonState());
+			// data.getInventoryState());
 		}
 	}
-
+	
+	/**
+	 * The entry point of the game application.
+	 *
+	 * @param args The command-line arguments.
+	 */
 	public static void main(String[] args) {
 		Application.run(Color.WHITE, t -> {
 			try {

@@ -27,13 +27,38 @@ import fr.game.data.item.Item;
 import fr.game.data.item.MeleeWeapon;
 import fr.umlv.zen5.ApplicationContext;
 
+/**
+ * The GameView class represents the graphical view of the game.
+ */
 public record GameView(GameData data, ImageLoader loader) {
+	
+	/**
+     * Initializes the game graphics.
+     *
+     * @param xOrigin The x-coordinate origin of the game graphics.
+     * @param yOrigin The y-coordinate origin of the game graphics.
+     * @param length  The length of the game graphics.
+     * @param data    The game data.
+     * @param loader  The image loader.
+     * @return The initialized GameView.
+     * @throws NullPointerException if data or loader is null.
+     */
 	public static GameView initGameGraphics(int xOrigin, int yOrigin, int length, GameData data, ImageLoader loader) {
 		Objects.requireNonNull(data);
 		Objects.requireNonNull(loader);
 		return new GameView(data, loader);
 	}
-
+	
+	/**
+	 * Draws an image on the graphics with the specified dimensions and position.
+	 *
+	 * @param graphics The graphics object to draw on.
+	 * @param image    The image to draw.
+	 * @param x        The x-coordinate position.
+	 * @param y        The y-coordinate position.
+	 * @param dimX     The width dimension.
+	 * @param dimY     The height dimension.
+	 */
 	private void drawImage(Graphics2D graphics, BufferedImage image, float x, float y, float dimX, float dimY) {
 		var width = image.getWidth();
 		var height = image.getHeight();
@@ -43,6 +68,18 @@ public record GameView(GameData data, ImageLoader loader) {
 		graphics.drawImage(image, transform, null);
 	}
 	
+	/**
+	 * Draws an image on the graphics with the specified dimensions and position, and updates the object position in the game data.
+	 *
+	 * @param graphics The graphics object to draw on.
+	 * @param image    The image to draw.
+	 * @param x        The x-coordinate position.
+	 * @param y        The y-coordinate position.
+	 * @param dimX     The width dimension.
+	 * @param dimY     The height dimension.
+	 * @param data     The game data.
+	 * @param item     The item to update the position for.
+	 */
 	private void drawImage(Graphics2D graphics, BufferedImage image, float x, float y, float dimX, float dimY, GameData data, Item item) {
 		var width = image.getWidth();
 		var height = image.getHeight();
@@ -52,7 +89,15 @@ public record GameView(GameData data, ImageLoader loader) {
 		graphics.drawImage(image, transform, null);
 		data.addObjectPosition(item, x, y, x + dimX, y + dimY);
 	}
-
+	
+	/**
+	 * Draws the menu on the graphics with the specified dimensions and game data.
+	 *
+	 * @param graphics The graphics object to draw on.
+	 * @param width    The width of the menu.
+	 * @param height   The height of the menu.
+	 * @param data     The game data.
+	 */
 	public void drawMenu(Graphics2D graphics, int width, int height, GameData data) {
 		drawImage(graphics, loader.image("main.png"), 0,0, height, width);
 		graphics.setColor(new Color(170, 127, 95, 255));
@@ -68,7 +113,17 @@ public record GameView(GameData data, ImageLoader loader) {
 		graphics.drawString("Jouer", (height / 2) - 315, (width - 190));
 		graphics.drawString("Quitter", (height / 2) + 240, (width - 190));
 	}
-
+	
+	/**
+	 * Draws a room on the map with the specified dimensions, position, and room data.
+	 *
+	 * @param graphics The graphics object to draw on.
+	 * @param dimX     The width dimension of the room.
+	 * @param dimY     The height dimension of the room.
+	 * @param posX     The x-coordinate position of the room.
+	 * @param posY     The y-coordinate position of the room.
+	 * @param room     The room data to draw.
+	 */
 	public void drawRoomOnMap(Graphics2D graphics, float dimX, float dimY, float posX, float posY, Room room) {
 		graphics.setColor(new Color(76, 47, 24, 255));
 		graphics.setStroke(new BasicStroke(2.0f));
@@ -76,7 +131,18 @@ public record GameView(GameData data, ImageLoader loader) {
 		graphics.setColor(new Color(170, 127, 95, 255));
 		graphics.fill(new RoundRectangle2D.Float(posX, posY, dimY - 1, dimX - 1, 20, 20));
 	}
-
+	
+	/**
+	 * Draws an item on the graphics with the specified position, dimensions, item data, and game data.
+	 *
+	 * @param graphics The graphics object to draw on.
+	 * @param posX     The x-coordinate position of the item.
+	 * @param posY     The y-coordinate position of the item.
+	 * @param dimx     The width dimension of the item.
+	 * @param dimy     The height dimension of the item.
+	 * @param item     The item data to draw.
+	 * @param data     The game data.
+	 */
 	public void drawItem(Graphics2D graphics, float posX, float posY, float dimx, float dimy, Item item, GameData data) {
 		if (item != null) {
 			var image = loader.image(item.itemImage());
@@ -87,6 +153,15 @@ public record GameView(GameData data, ImageLoader loader) {
 		}
 	}
 	
+	/**
+	 * Draws an item on the graphics with the specified position, item data, and game data using the application context.
+	 *
+	 * @param context The application context.
+	 * @param posX    The x-coordinate position of the item.
+	 * @param posY    The y-coordinate position of the item.
+	 * @param item    The item data to draw.
+	 * @param data    The game data.
+	 */
 	public void drawItem(ApplicationContext context, float posX, float posY, Item item, GameData data) {
 		context.renderFrame(graphics -> {
 			if (item != null) {
@@ -103,26 +178,44 @@ public record GameView(GameData data, ImageLoader loader) {
 			}
 		});
 	}
-
+	
+	
+	/**
+	 * Draws the map button on the application interface with the specified application context, height, width, and game data.
+	 *
+	 * @param context The application context.
+	 * @param height  The height of the interface.
+	 * @param width   The width of the interface.
+	 * @param data    The game data.
+	 */
 	public void drawMapButton(ApplicationContext context, int height, int width, GameData data) {
 		context.renderFrame(graphics -> {
 			var map = loader.image("mapButton.png");
 			drawImage(graphics, map, width - map.getWidth(), map.getHeight(), map.getWidth(), map.getHeight());
-			data.setInventoryButtonState(false);
-			data.setMapButtonState(true);
 		});
 	}
 
+	/**
+	 * Draws the inventory button on the application interface with the specified application context, height, width, and game data.
+	 *
+	 * @param context The application context.
+	 * @param height  The height of the interface.
+	 * @param width   The width of the interface.
+	 * @param data    The game data.
+	 */
 	public void drawInventoryButton(ApplicationContext context, int height, int width, GameData data) {
 		context.renderFrame(graphics -> {
 			var map = loader.image("inventoryButton.png");
 			drawImage(graphics, map, (width - getMapButtonsize()[0]), (float) (getMapButtonsize()[1]),
 					getMapButtonsize()[0], getMapButtonsize()[1]);
-			data.setMapButtonState(false);
-			data.setInventoryButtonState(true);
 		});
 	}
-
+	
+	/**
+	 * Retrieves the dimensions of the map button.
+	 *
+	 * @return An array of integers representing the width and height of the map button.
+	 */
 	public int[] getMapButtonsize() {
 		int[] dimensions = new int[2];
 		var map = loader.image("mapButton.png");
@@ -130,7 +223,12 @@ public record GameView(GameData data, ImageLoader loader) {
 		dimensions[1] = map.getHeight();
 		return dimensions;
 	}
-
+	
+	/**
+	 * Retrieves the dimensions of the inventory button.
+	 *
+	 * @return An array of integers representing the width and height of the inventory button.
+	 */
 	public int[] getInventoryButtonsize() {
 		int[] dimensions = new int[2];
 		var map = loader.image("inventoryButton.png");
@@ -138,30 +236,58 @@ public record GameView(GameData data, ImageLoader loader) {
 		dimensions[1] = map.getHeight();
 		return dimensions;
 	}
-
+	
+	/**
+	 * Retrieves the dimensions of the play button.
+	 *
+	 * @return An array of integers representing the width and height of the play button.
+	 */
 	public int[] getPlayButtonsize() {
 		int[] dimensions = new int[2];
 		dimensions[0] = 500;
 		dimensions[1] = 200;
 		return dimensions;
 	}
-
+	
+	/**
+	 * Retrieves the position of the play button on the interface based on the specified width and height.
+	 *
+	 * @param width  The width of the interface.
+	 * @param height The height of the interface.
+	 * @return An array of integers representing the x and y coordinates of the exit button.
+	 */
 	public int[] getMenuButtonPosition(float width, float height) {
 		int[] dimensions = new int[2];
 		dimensions[0] = (int) (height / 2) - 525;
 		dimensions[1] = (int) (width - 250);
 		return dimensions;
 	}
-
+	
+	/**
+	 * Retrieves the position of the exit button on the interface based on the specified width and height.
+	 *
+	 * @param width  The width of the interface.
+	 * @param height The height of the interface.
+	 * @return An array of integers representing the x and y coordinates of the exit button.
+	 */
 	public int[] getExitButtonPosition(float width, float height) {
 		int[] dimensions = new int[2];
 		dimensions[0] = (int) (height / 2) + 25;
 		dimensions[1] = (int) (width - 250);
 		return dimensions;
 	}
-
+	
+	/**
+	 * Draws the map on the application interface with the specified application context, height, width, and game data.
+	 *
+	 * @param context The application context.
+	 * @param height  The height of the interface.
+	 * @param width   The width of the interface.
+	 * @param data    The game data.
+	 * @return An array of floats representing the x and y coordinates, and dimensions (dimX and dimY) of the drawn map.
+	 */
 	public float[] drawMap(ApplicationContext context, int height, int width, GameData data) {
-		if (data.getMapButtonState()) {
+		if (data.getMapState()) {
 			var coordonnees = new float[4];
 			context.renderFrame(graphics -> {
 				draw(graphics, context, data);
@@ -200,14 +326,21 @@ public record GameView(GameData data, ImageLoader loader) {
 				coordonnees[2] = dimX;
 				coordonnees[3] = dimY;
 			});
-			data.setMapButtonState(false);
-			data.setInventoryButtonState(true);
 
 			return coordonnees;
 		}
 		return null;
 	}
-
+	
+	/**
+	 * Draws the corridor on the application interface with the specified application context, height, width, game data, and corridor data.
+	 *
+	 * @param context   The application context.
+	 * @param height    The height of the interface.
+	 * @param width     The width of the interface.
+	 * @param data      The game data.
+	 * @param corridor  The corridor data.
+	 */
 	public void drawCorridor(ApplicationContext context, int height, int width, GameData data, Corridor corridor) {
 		context.renderFrame(graphics -> {
 			draw(graphics, context, data);
@@ -224,11 +357,29 @@ public record GameView(GameData data, ImageLoader loader) {
 		}
 
 	}
-
+	
+	/**
+	 * Draws the exit door on the application interface with the specified application context, height, width, game data, and exit door data.
+	 *
+	 * @param context   The application context.
+	 * @param height    The height of the interface.
+	 * @param width     The width of the interface.
+	 * @param data      The game data.
+	 * @param exitDoor  The exit door data.
+	 */
 	public void drawExitDoor(ApplicationContext context, int height, int width, GameData data, ExitDoor exitDoor) {
 
 	}
 
+	/**
+	 * Draws the healer on the application interface with the specified application context, height, width, game data, and healer data.
+	 *
+	 * @param context   The application context.
+	 * @param height    The height of the interface.
+	 * @param width     The width of the interface.
+	 * @param data      The game data.
+	 * @param healer    The healer data.
+	 */
 	public void drawHealer(ApplicationContext context, int height, int width, GameData data, Healer healer) {
 		context.renderFrame(graphics -> {
 			draw(graphics, context, data);
@@ -240,7 +391,16 @@ public record GameView(GameData data, ImageLoader loader) {
 			drawImage(graphics, image, posX, posY, dimx, dimy);
 		});
 	}
-
+	
+	/**
+	 * Draws the merchant on the application interface with the specified application context, height, width, game data, and merchant data.
+	 *
+	 * @param context   The application context.
+	 * @param height    The height of the interface.
+	 * @param width     The width of the interface.
+	 * @param data      The game data.
+	 * @param merchant  The merchant data.
+	 */
 	public void drawMerchant(ApplicationContext context, int height, int width, GameData data, Merchant merchant) {
 		context.renderFrame(graphics -> {
 			draw(graphics, context, data);
@@ -252,18 +412,37 @@ public record GameView(GameData data, ImageLoader loader) {
 			drawImage(graphics, image, posX, posY, dimx, dimy);
 		});
 	}
-
+	
+	/**
+	 * Draws the treasure on the application interface with the specified application context, height, width, game data, and treasure data.
+	 *
+	 * @param context   The application context.
+	 * @param height    The height of the interface.
+	 * @param width     The width of the interface.
+	 * @param data      The game data.
+	 * @param treasure  The treasure data.
+	 */
 	public void drawTreasure(ApplicationContext context, int height, int width, GameData data, Treasure treasure) {
 
 	}
-
+	
+	
+	/**
+	 * Navigates to a specific room on the application interface with the specified application context, height, width, game data, and room coordinates.
+	 *
+	 * @param context           The application context.
+	 * @param height            The height of the interface.
+	 * @param width             The width of the interface.
+	 * @param data              The game data.
+	 * @param roomCoordonnees   The coordinates of the room to navigate to.
+	 */
 	public void goToRoom(ApplicationContext context, int height, int width, GameData data,
 			Coordonnees roomCoordonnees) {
 		var room = data.getFloor().getRoom(roomCoordonnees.x(), roomCoordonnees.y());
 		System.out.println("les coordonnees envoyés dans setCurrentRoom : x = " + roomCoordonnees.x() + " y = " +roomCoordonnees.y());
 		data.setCurrentRoom(roomCoordonnees.y(), roomCoordonnees.x());
-		data.setInventoryButtonState(true);
-		data.setMapButtonState(false);
+		data.setInventoryState(true);
+		data.setMapState(false);
 		switch (room.getName()) {
 		case "corridor":
 			drawCorridor(context, height, width, data, (Corridor) room);
@@ -283,11 +462,27 @@ public record GameView(GameData data, ImageLoader loader) {
 		}
 	}
 
+	/**
+	 * Draws the background image on the graphics context with the specified dimensions and game data.
+	 *
+	 * @param graphics  The graphics context.
+	 * @param height    The height of the interface.
+	 * @param width     The width of the interface.
+	 * @param data      The game data.
+	 */
 	public void drawBackground(Graphics2D graphics, int height, int width, GameData data) {
 		var image = loader.image("background5.jpg");
 		drawImage(graphics, image, 0, 0, width, height);
 	}
 
+	/**
+	 * Draws the hero on the graphics context with the specified dimensions and game data.
+	 *
+	 * @param graphics  The graphics context.
+	 * @param height    The height of the interface.
+	 * @param width     The width of the interface.
+	 * @param data      The game data.
+	 */
 	public void drawHero(Graphics2D graphics, int height, int width, GameData data) {
 		var image = loader.image(data.getHero().getCharacterImage());
 		float dimx = (float) (image.getWidth() * 1.5);
@@ -311,12 +506,24 @@ public record GameView(GameData data, ImageLoader loader) {
 		drawImage(graphics, image, posX-(image.getWidth()/4), posY-(image.getHeight()/2), image.getWidth(), image.getHeight());
 		var heroEnergy = data.getHero().getEnergyPoint();
 		graphics.drawString(data.getHero().getEnergyPoint() + "", posX+(image.getWidth()/5), posY+(image.getHeight()/7));
-		if (data.getHero().defensePoint() != 0) {
+		if (data.getHero().defensePoint() > 0) {
 			image = loader.image("protection.png");
 			drawImage(graphics, image, (float) healthBar.getX() - (image.getWidth()/4), (float) healthBar.getY() - (image.getHeight()/4), image.getWidth()/1.5f, image.getHeight()/1.5f);
+			graphics.setFont(font);
+			graphics.setColor(Color.WHITE);
+			graphics.drawString(data.getHero().defensePoint() + "", (float) healthBar.getX(), (float) healthBar.getY() + 20);
 		}
 	}
-
+	
+	/**
+	 * Draws the monsters on the application interface with the specified application context, height, width, game data, and monster data.
+	 *
+	 * @param context   The application context.
+	 * @param height    The height of the interface.
+	 * @param width     The width of the interface.
+	 * @param data      The game data.
+	 * @param monster   The monster data.
+	 */
 	public void drawMonster(ApplicationContext context, int height, int width, GameData data, Monster... monster) {
 		context.renderFrame(graphics -> {
 			var length = 1;
@@ -353,7 +560,15 @@ public record GameView(GameData data, ImageLoader loader) {
 		});
 
 	}
-
+	
+	/**
+	 * Draws the inventory on the graphics context with the specified dimensions and game data.
+	 *
+	 * @param graphics  The graphics context.
+	 * @param height    The height of the interface.
+	 * @param width     The width of the interface.
+	 * @param data      The game data.
+	 */
 	public void drawInventory(Graphics2D graphics, int height, int width, GameData data) {
 		var inventaire = data.getInventory();
 		var list = inventaire.showContains();
@@ -383,6 +598,14 @@ public record GameView(GameData data, ImageLoader loader) {
 		}
 	}
 	
+	/**
+	 * Draws a green rectangle on the selected item at the specified position with the specified item and game data.
+	 *
+	 * @param context   The application context.
+	 * @param position  The position of the item selector.
+	 * @param item      The selected item.
+	 * @param data      The game data.
+	 */
 	public void drawItemSelector(ApplicationContext context, Coordonnees position, Item item, GameData data) {
 		context.renderFrame(graphics -> {
 			graphics.setColor(Color.GREEN);
@@ -397,6 +620,14 @@ public record GameView(GameData data, ImageLoader loader) {
 		
 	}*/
 	
+	/**
+	 * Draws the current room on the application interface based on the room type in the game data.
+	 *
+	 * @param context   The application context.
+	 * @param height    The height of the interface.
+	 * @param width     The width of the interface.
+	 * @param data      The game data.
+	 */
 	public void drawCurrentRoom(ApplicationContext context, int height, int width, GameData data) {
 		System.out.println("La salle actuelle : " + data.getCurrentRoom().getName());
 		switch(data.getCurrentRoom().getName()) {
@@ -418,6 +649,14 @@ public record GameView(GameData data, ImageLoader loader) {
 		}
 	}
 	
+	/**
+	 * Draws the healer menu on the application interface with the specified application context, width, height, and game data.
+	 *
+	 * @param context   The application context.
+	 * @param width     The width of the interface.
+	 * @param height    The height of the interface.
+	 * @param data      The game data.
+	 */
 	public void drawMenuHealer(ApplicationContext context, float width, float height, GameData data) {
         context.renderFrame(graphics -> {
         graphics.setColor(Color.DARK_GRAY);
@@ -440,8 +679,14 @@ public record GameView(GameData data, ImageLoader loader) {
         graphics.drawString("Non merci", (width / 2) - 90, (height / 2) + 180);
         });
     }
-
-
+	
+	/**
+	 * Draws the game elements on the graphics context with the specified application context, game data, and view.
+	 *
+	 * @param graphics  The graphics context.
+	 * @param context   The application context.
+	 * @param data      The game data.
+	 */
 	public void draw(Graphics2D graphics, ApplicationContext context, GameData data) {
 		var screenInfo = context.getScreenInfo();
 		var width = screenInfo.getHeight();
@@ -453,7 +698,7 @@ public record GameView(GameData data, ImageLoader loader) {
 			drawInventory(graphics, (int) width, (int) height, data);
 			drawHero(graphics, (int) width, (int) height, data);
 			//drawItem(graphics, 500f, 500f, (float) (loader.image("cell.png").getWidth()), (float) (loader.image("cell.png").getHeight()), new MeleeWeapon("Common", 10, 5), data);
-			if (!data.getMapButtonState()) {
+			if (data.getInventoryState()) {
 				drawMapButton(context, (int) width, (int) height, data);
 			}
 			else {
@@ -463,7 +708,14 @@ public record GameView(GameData data, ImageLoader loader) {
 		}
 
 	}
-
+	
+	/**
+	 * Draws the game view on the application interface using the specified application context, game data, and view.
+	 *
+	 * @param context   The application context.
+	 * @param data      The game data.
+	 * @param view      The game view.
+	 */
 	public static void draw(ApplicationContext context, GameData data, GameView view) {
 		context.renderFrame(graphics -> view.draw(graphics, context, data));
 	}

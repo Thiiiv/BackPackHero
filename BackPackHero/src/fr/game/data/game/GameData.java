@@ -16,19 +16,25 @@ import fr.game.data.item.Item;
 import fr.game.data.item.MeleeWeapon;
 import fr.game.data.Coordonnees;
 
-
+/**
+ * Represents the game data including the inventory, hero, stages, and game state.
+ */
 public class GameData {
 	private final Inventory inventaire;
 	private final Hero hero;
 	private final Floor actualStage;
-	private boolean mapButtonState = false;
-	private boolean inventoryButtonState = false;
+	private boolean mapState = false;
+	private boolean inventoryState = true;
 	private boolean menuState = true;
 	private final Floor stage1;
 	private final Floor stage2;
 	private final Floor stage3;
 	private final HashMap<Coordonnees, Item> objectPositions;
 	
+    /**
+     * Constructs a new instance of GameData with default values and initializes the stages and object positions.
+     */
+
 	public GameData() {
 		this.inventaire = new Inventory();
 		this.hero = new Hero();
@@ -74,71 +80,148 @@ public class GameData {
 		}*/
 	}
 	
+	/**
+     * Retrieves the hero .
+     *
+     * @return The hero .
+     */
 	public Hero getHero() {
 		return hero;
 	}
 	
-	public void changeMapButtonState() {
-		if (mapButtonState) {
-			mapButtonState = false;
+	/**
+     * Changes the state of the map and inventory buttons.
+     * If the map state is true, it sets the map state to false and the inventory state to true, and vice versa.
+     */
+	public void changeButtonsState() {
+		if (mapState) {
+			mapState = false;
+			inventoryState = true;
 		}
 		else {
-			mapButtonState = true;
+			mapState = true;
+			inventoryState = false;
 		}
 	}
 	
-	public void setMapButtonState(boolean state) {
-		mapButtonState = state;
+	/**
+     * Sets the state of the map button.
+     *
+     * @param state The state of the map button.
+     */
+	public void setMapState(boolean state) {
+		mapState = state;
 	}
 	
+
+    /**
+     * Sets the state of the menu button.
+     *
+     * @param state The state of the menu button.
+     */
 	public void setMenuState(boolean state) {
 		menuState = state;
 	}
 	
-	public void setInventoryButtonState(boolean state) {
-		inventoryButtonState = state;
+	/**
+     * Sets the state of the inventory button.
+     *
+     * @param state The state of the inventory button.
+     */
+	public void setInventoryState(boolean state) {
+		inventoryState = state;
 	}
 	
-	public void changeInventoryButtonState() {
-		if (inventoryButtonState) {
-			inventoryButtonState = false;
+	/**
+     * Changes the state of the inventory button.
+     * If the inventory state is true, it sets the inventory state to false, and vice versa.
+     */
+	public void changeInventoryState() {
+		if (inventoryState) {
+			inventoryState = false;
 		}
 		else {
-			inventoryButtonState = true;
+			inventoryState = true;
 		}
 	}
 	
-	public boolean getMapButtonState() {
-		return mapButtonState;
+
+    /**
+     * Retrieves the state of the map button.
+     *
+     * @return The state of the map button.
+     */
+	public boolean getMapState() {
+		return mapState;
 	}
 	
+
+    /**
+     * Retrieves the state of the menu button.
+     *
+     * @return The state of the menu button.
+     */
 	public boolean getMenuState() {
 		return menuState;
 	}
 	
-	public boolean getInventoryButtonState() {
-		return inventoryButtonState;
+	 /**
+     * Retrieves the state of the inventory button.
+     *
+     * @return The state of the inventory button.
+     */
+	public boolean getInventoryState() {
+		return inventoryState;
 	}
 	
+	/**
+     * Adds an item to the inventory at the specified position.
+     *
+     * @param x    The x-coordinate of the item in the inventory.
+     * @param y    The y-coordinate of the item in the inventory.
+     * @param item The item to add.
+     */
 	public void addItem(int x, int y, Item item) {
 		this.inventaire.add(x, y, item);
 	}
 	
+	/**
+     * Retrieves the current floor.
+     *
+     * @return The current floor.
+     */
 	public Floor getFloor() {
 		return stage1;
 	}
 	
+
+    /**
+     * Retrieves the inventory object.
+     *
+     * @return The inventory object.
+     */
 	public Inventory getInventory() {
 		return this.inventaire;
 	}
 	
+	/**
+     * Checks if a button at the specified coordinates is clicked, based on the current state.
+     *
+     * @param x        The x-coordinate of the click.
+     * @param y        The y-coordinate of the click.
+     * @param buttonX  The x-coordinate of the button.
+     * @param buttonY  The y-coordinate of the button.
+     * @param dimX     The width of the button.
+     * @param dimY     The height of the button.
+     * @return The button that is clicked ("mapButton", "inventoryButton"), or null if no button is clicked.
+     */
 	public String clickOnButton(float x, float y, int buttonX, int buttonY, int dimX, int dimY) {
-		if (mapButtonState) {
+		if (mapState) {
 			if (x >= buttonX && x <= buttonX+dimX && y >= buttonY && y <= buttonY+dimY) {
 				return "mapButton";
 			}
 		}
-		else if (inventoryButtonState) {
+		else if (inventoryState) {
 			if (x >= buttonX && x <= buttonX+dimX && y >= buttonY && y <= buttonY+dimY) {
 				return "inventoryButton";
 			}
@@ -146,10 +229,32 @@ public class GameData {
 		return null;
 	}
 	
+	 /**
+     * Checks if the menu button at the specified coordinates is clicked.
+     *
+     * @param x        The x-coordinate of the click.
+     * @param y        The y-coordinate of the click.
+     * @param buttonX  The x-coordinate of the menu button.
+     * @param buttonY  The y-coordinate of the menu button.
+     * @param dimX     The width of the menu button.
+     * @param dimY     The height of the menu button.
+     * @return true if the menu button is clicked, false otherwise.
+     */
 	public boolean clickOnMenuButton(float x, float y, int buttonX, int buttonY, int dimX, int dimY) {
 		return (x >= buttonX && x <= buttonX+dimX && y >= buttonY && y <= buttonY+dimY);
 	}
 	
+	/**
+     * Checks if a point on the map is clicked.
+     *
+     * @param x       The x-coordinate of the click.
+     * @param y       The y-coordinate of the click.
+     * @param floorX  The x-coordinate of the floor on the screen.
+     * @param floorY  The y-coordinate of the floor on the screen.
+     * @param roomX   The width of a room on the screen.
+     * @param roomY   The height of a room on the screen.
+     * @return The coordinates of the clicked room on the map, or null if no room is clicked.
+     */
 	public Coordonnees clickOnMap(float x, float y, float floorX, float floorY, int roomX, int roomY) {
 		if (x >= floorX && x <= floorX+roomX*11 && y >= floorY && y <= floorY+roomY*5) {
 			for (var i = 0; i < 5; i++) {
@@ -170,16 +275,40 @@ public class GameData {
 		
 	}
 	
+	/**
+     * Retrieves the positions of objects on the map.
+     *
+     * @return The positions of objects on the map.
+     */
 	public HashMap<Coordonnees, Item> getObjectsPosition() {
 		return objectPositions;
 	}
 	
+	 /**
+     * Adds an object position to the map.
+     *
+     * @param item The item to add.
+     * @param x    The x-coordinate of the object's position.
+     * @param y    The y-coordinate of the object's position.
+     * @param x2   The second x-coordinate of the object's position (if applicable).
+     * @param y2   The second y-coordinate of the object's position (if applicable).
+     */
 	public void addObjectPosition(Item item, float x, float y, float x2, float y2) {
 		if (!objectPositions.containsKey(new Coordonnees(x, y, x2, y2))) {
 			objectPositions.put(new Coordonnees(x, y, x2, y2), item);
 		}
 	}
 	
+	/**
+    * Removes an object position from the map.
+    *
+    * @param item The item to remove.
+    * @param x    The x-coordinate of the object's position.
+    * @param y    The y-coordinate of the object's position.
+    * @param x2   The second x-coordinate of the object's position (if applicable).
+    * @param y2   The second y-coordinate of the object's position (if applicable).
+    * @return A message indicating the status of the removal operation.
+    */
 	public String removeObjectPosition(Item item, float x, float y, float x2, float y2) {
 		if (objectPositions.containsKey(new Coordonnees(x, y, x2, y2))) {
 			if (objectPositions.get(new Coordonnees(x, y, x2, y2)).equals(item)) {
@@ -193,6 +322,11 @@ public class GameData {
 		return "Il y a eu un problème";
 	}
 	
+	/**
+     * Retrieves the current room where the hero is located.
+     *
+     * @return The current room where the hero is located, or null if the hero is not in any room.
+     */
 	public Room getCurrentRoom() {
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 11; j++) {
@@ -206,6 +340,13 @@ public class GameData {
 		return null;
 	}
 	
+	/**
+     * Sets the current room where the hero is located.
+     *
+     * @param x The x-coordinate of the room.
+     * @param y The y-coordinate of the room.
+     * @return true if the current room is successfully set, false otherwise.
+     */
 	public boolean setCurrentRoom(int x, int y) {
 		if (actualStage.getRoom(y, x) == null) {
 			return false;
@@ -224,7 +365,15 @@ public class GameData {
 		}
 		return true;
 	}
-	
+
+    /**
+     * Checks if an item is clicked on the map.
+     *
+     * @param x The x-coordinate of the click.
+     * @param y The y-coordinate of the click.
+     * @return A HashMap containing the coordinates and item of the clicked object,
+     *         or null if no item is clicked.
+     */
 	public HashMap<Coordonnees, Item> clickOnItem(float x, float y) {
 		for (var i : objectPositions.keySet()) {
 			if (i.isPointInside(x, y)) {
@@ -234,6 +383,13 @@ public class GameData {
 		return null;
 	}
 	
+
+    /**
+     * Checks if an item is in the inventory.
+     *
+     * @param item The item to check.
+     * @return true if the item is in the inventory, false otherwise.
+     */
 	public boolean isItemInInventory(Item item) {
 		if (inventaire.get(item) != null) {
 			return true;
@@ -241,6 +397,15 @@ public class GameData {
 		return false;
 	}
 	
+	/**
+     * Checks if the click is inside the hero's room.
+     *
+     * @param clickX  The x-coordinate of the click.
+     * @param clickY  The y-coordinate of the click.
+     * @param height  The height of the game window.
+     * @param width   The width of the game window.
+     * @return true if the click is inside the hero's room, false otherwise.
+     */
 	public boolean isClickedInRoom(float clickX, float clickY,float height,float width) {
         var loader = new ImageLoader("data", List.of(Path.of("hero-4.png").toString()));
         float dimX = (float) (loader.image("hero-4.png").getWidth() * 1.5);
@@ -257,6 +422,18 @@ public class GameData {
         return false; 
     }
 	
+	 /**
+     * Handles the click on the healer menu.
+     *
+     * @param clickX The x-coordinate of the click.
+     * @param clickY The y-coordinate of the click.
+     * @param width  The width of the game window.
+     * @param height The height of the game window.
+     * @return A string indicating the action performed based on the click:
+     *         - "heal" if the heal button is clicked.
+     *         - "no-heal" if the "No thanks" button is clicked.
+     *         - "null" if no button is clicked.
+     */
 	public String clickOnMenuHealer(float clickX, float clickY, float width, float height) {
         // Vérification pour le bouton "Heal 10 PV pour 5 coins"
         float healButtonX = (width / 2) - 200;
