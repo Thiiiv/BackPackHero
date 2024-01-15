@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1704296804 source:c:\users\etudiant\documents\enzo++\projet_informatique\main.cpp
+	<iostream>
+
+1705170931 source:c:\users\enzoj\onedrive\documents\enzo\cfa\ciel\programmation\projet_informatique\main.cpp
+	<iostream>
+	<Windows.h>
+	<cstdlib>
+
