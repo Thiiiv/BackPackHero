@@ -1,3 +1,4 @@
+# Existing rules
 .metadata
 bin/
 tmp/
@@ -58,3 +59,16 @@ local.properties
 # Uncomment this line if you wish to ignore the project description file.
 # Typically, this file would be tracked if it contains build/dependency configurations:
 #.project
+
+# My new rules
+# Compiled class files
+*.class
+
+# Output directory
+/BackPackHero/bin/
+
+# Log files
+*.log
+
+# Temporary files created by me
+sources.txt
