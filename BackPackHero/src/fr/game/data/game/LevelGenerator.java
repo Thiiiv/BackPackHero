@@ -24,14 +24,14 @@ public class LevelGenerator {
         // Fill with walls initially
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                floor.add(x, y, new Wall());
+                floor.add(y, x, new Wall());
             }
         }
 
         // Simple random walk to create paths
         int startX = random.nextInt(width);
         int startY = 0;
-        floor.add(startX, startY, new Corridor(0)); // Starting room
+        floor.add(startY, startX, new Corridor(0)); // Starting room
 
         int currentX = startX;
         int currentY = startY;
@@ -73,10 +73,10 @@ public class LevelGenerator {
 
         // Place the exit door at the bottom
         int exitX = random.nextInt(width);
-        floor.add(exitX, height - 1, new ExitDoor());
+        floor.add(height - 1, exitX, new ExitDoor());
 
         // Ensure the starting room is a corridor
-        floor.add(startX, startY, new Corridor(0));
+        floor.add(startY, startX, new Corridor(0));
         floor.getRoom(startY, startX).setHeroHere(true);
 
         return floor;
