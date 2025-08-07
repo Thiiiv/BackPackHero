@@ -6,12 +6,14 @@ import java.util.List;
 public class Floor {
 	private final Room[][] floor;
 	
-	public Floor() {
-		this.floor = new Room[5][11];
+	public Floor(int width, int height) {
+		this.floor = new Room[height][width];
 	}
 	
 	public void add(int x, int y, Room room) {
-		floor[x][y] = room;
+		if (x >= 0 && x < floor.length && y >= 0 && y < floor[0].length) {
+			floor[x][y] = room;
+		}
 	}
 	
 	public Coordonnees getRoomPosition(Room room) {
@@ -36,8 +38,8 @@ public class Floor {
 	
 	public ArrayList<Room> getAllRooms() {
 		var list = new ArrayList<Room>();
-		for (int i = 0; i < 5; i++) {
-			for (int j = 0; j < 11; j++) {
+		for (int i = 0; i < floor.length; i++) {
+			for (int j = 0; j < floor[0].length; j++) {
 				list.add(floor[i][j]);
 			}
 		}
@@ -45,8 +47,8 @@ public class Floor {
 	}
 	
 	public List<Room> findShortestPath(Floor floor, int startX, int startY, int targetX, int targetY) {
-	    int rows = 5;
-	    int cols = 11;
+	    int rows = this.floor.length;
+	    int cols = this.floor[0].length;
 
 	    int[][] distances = new int[rows][cols];
 	    boolean[][] visited = new boolean[rows][cols];

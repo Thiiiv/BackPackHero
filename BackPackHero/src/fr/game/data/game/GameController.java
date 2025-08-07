@@ -110,38 +110,34 @@ public class GameController {
 		var data = new GameData();
 		data.addItem(0, 0, new MeleeWeapon("Common", 7, 1));
 		data.addItem(0, 1, new RangedWeapon("Common", 7, 1));
-		data.addItem(0, 2, new Shield("Common", 1, 10));
+		data.addItem(1, 2, new Shield("Common", 1, 10));
 		var view = GameView.initGameGraphics(margin, margin, (int) Math.min(width, height) - 2 * margin, data, images);
 		GameView.draw(context, data, view);
 		var dimMapButton = view.getMapButtonsize();
 		float[] floorCoordonnees = null;
+
+		final DraggedItemWrapper draggedItemWrapper = new DraggedItemWrapper();
+		Coordonnees originalItemPosition = null;
+
 		while (true) {
 			var event = context.pollOrWaitEvent((long) Math.pow(10, 8));
-			/*
-			 * if (!gameLoop(context, data, view)) { //
-			 * System.out.println("Thank you for quitting!"); context.exit(0); }
-			 */
+
 			if (event == null) {
 				continue;
 			}
 			var action = event.getAction();
-			// System.out.println("Une action a été effectué : " + action);
-			if (action == Action.POINTER_DOWN) {
-				var location = event.getLocation();
-				/*
-				 * System.out.println(data.clickOnButton(location.x, location.y, (int) (width -
-				 * dimMapButton[0]), 0, dimMapButton[0], dimMapButton[1]));
-				 * System.out.println("x = " + location.x + " y = " + location.y +
-				 * " buttonX1 = " + (width - dimMapButton[0]) + " buttonY1 = " + 0 +
-				 * " buttonX2 = " + (width - dimMapButton[0]) + dimMapButton[0] + " buttonY2 = "
-				 * + dimMapButton[1]);
-				 */
-				if (location != null) {
-					if (data.getMenuState()) {
+
+			if (action == Action.KEY_PRESSED && event.getKey() == KeyboardKey.Q) {
+				context.exit(0);
+				return;
+			}
+
+			if (data.getMenuState()) {
+				if (action == Action.POINTER_DOWN) {
+					var location = event.getLocation();
+					if (location != null) {
 						var posMenuButton = view.getMenuButtonPosition(height, width);
 						var dimPlay = view.getPlayButtonsize();
-						// System.out.println("positionPlay : " + positionPlay[0] + ", " +
-						// positionPlay[1] + " dimPlay : " + dimPlay[0] + ", " + dimPlay[1]);
 						if (data.clickOnMenuButton(location.x, location.y, posMenuButton[0], posMenuButton[1],
 								dimPlay[0], dimPlay[1])) {
 							data.setMenuState(false);
@@ -154,27 +150,81 @@ public class GameController {
 								context.exit(0);
 							}
 						}
-					} else {
-						System.out.println("posX = " + location.x + " posY = " + location.y);
 					}
+				}
+				continue; // Skip the rest of the loop if in menu state
+			}
+
+
+			switch (action) {
+				case POINTER_DOWN: {
+					var location = event.getLocation();
+					if (location != null) {
+						var clickedItemInfo = data.clickOnItem(location.x, location.y);
+						if (clickedItemInfo != null) {
+							Item clickedItem = (Item) clickedItemInfo.values().toArray()[0];
+							if (data.isItemInInventory(clickedItem)) {
+								draggedItemWrapper.item = clickedItem;
+								originalItemPosition = data.getInventory().get(clickedItem);
+								data.getInventory().removeItemFromInventory(draggedItemWrapper.item);
+								// We don't remove from objectPositions immediately, to avoid flickering
+							}
+						}
+					}
+				}
+				break;
+
+				case POINTER_MOVE: {
+					if (draggedItemWrapper.item != null) {
+						var location = event.getLocation();
+						context.renderFrame(graphics -> {
+							view.draw(graphics, context, data);
+							view.drawDraggedItem(graphics, draggedItemWrapper.item, (float)location.getX(), (float)location.getY());
+						});
+					}
+				}
+				break;
+
+				case POINTER_UP: {
+					if (draggedItemWrapper.item != null) {
+						var location = event.getLocation();
+						Coordonnees dropPosition = view.getInventoryCell((float)location.getX(), (float)location.getY(), width, height);
+
+						if (dropPosition != null && data.getInventory().isSpaceAvailable(dropPosition.y(), dropPosition.x(), draggedItemWrapper.item)) {
+							data.getInventory().add(dropPosition.y(), dropPosition.x(), draggedItemWrapper.item);
+						} else {
+							// Return to original position if drop is invalid
+							data.getInventory().add(originalItemPosition.y(), originalItemPosition.x(), draggedItemWrapper.item);
+						}
+
+						draggedItemWrapper.item = null;
+						originalItemPosition = null;
+						GameView.draw(context, data, view); // Redraw the final state
+					}
+				}
+				break;
+			default:
+				break;
+			}
+
+
+			if (action == Action.POINTER_DOWN) {
+				var location = event.getLocation();
+				if (location != null && draggedItemWrapper.item == null) {
 					Room CurentRoom=data.getCurrentRoom();
                     if (CurentRoom.getName()=="healer") {
                     	if(data.isClickedInRoom(location.x, location.y, height, width)) {
-                            System.out.println("---------------------------------------");
-                            System.out.println("Healer Work");
-                            System.out.println("---------------------------------------");
                             view.drawMenuHealer(context,width,height, data);
                             while(true){
-                                event = context.pollOrWaitEvent((long) Math.pow(10, 8));
-                                if (event == null) {
+                                var healerEvent = context.pollOrWaitEvent((long) Math.pow(10, 8));
+                                if (healerEvent == null) {
                                     continue;
                                 }
-                                action = event.getAction();
-                                if (action == Action.POINTER_DOWN) {
-                                    location = event.getLocation();
-                                    if (location != null) {
-                                    	System.out.println("location : " + " x = " + location.x + " y = " + location.y);
-                                    	var clickOnMenuHealer = data.clickOnMenuHealer(location.x, location.y, width, height);
+                                var healerAction = healerEvent.getAction();
+                                if (healerAction == Action.POINTER_DOWN) {
+                                    var healerLocation = healerEvent.getLocation();
+                                    if (healerLocation != null) {
+					var clickOnMenuHealer = data.clickOnMenuHealer(healerLocation.x, healerLocation.y, width, height);
                                         if(clickOnMenuHealer != null){
                                             view.drawCurrentRoom(context, (int) height, (int) width, data);
                                             break;
@@ -216,163 +266,15 @@ public class GameController {
 						if (detectRoom != null) {
 							// System.out.println("detectRoom : " + detectRoom);
 							view.goToRoom(context, (int) height, (int) width, data, detectRoom);
-							if (data.getCurrentRoom().getName() == "corridor") {
+							if (data.getCurrentRoom().getName().equals("corridor")) {
 								var room = (Corridor) data.getCurrentRoom();
-								if (room.isThereMonster()) {
-									if (!room.areMonstersDead()) {
-										var monsters = room.getMonsters();
-										Monster monster1 = null;
-										Monster monster2 = null;
-										if (monsters.size() == 2) {
-											monster1 = monsters.get(1);
-											monster2 = monsters.get(0);
-										}
-										else {
-											monster1 = monsters.get(0);
-										}
-										monster1.setSelected(true);
-										//System.out.println("Je suis au dessus de la boucle while");
-										var tour = "hero";
-										var isAttack1 = true;
-										var isAttack2 = true;
-										var count = 0;
-										Weapon clickedWeapon;
-										while (room.areMonstersDead() == false) {
-											if (count == 0) {
-												if (monster1.preventAction() == "attack") {
-													isAttack1 = true;
-												}
-												else {
-													isAttack1 = false;
-												}
-												if (monster2 != null) {
-													if (monster2.preventAction() == "attack") {
-														isAttack2 = true;
-													}
-													else {
-														isAttack2 = false;
-													}
-												}
-												view.drawCurrentRoom(context, (int) height, (int) width, data);
-												count = 1;
-											}
-											//System.out.println("Je suis dans la boucle while\nVoici l'état des monsters de la salle : " + room.areMonstersDead());
-											event = context.pollOrWaitEvent((long) Math.pow(10, 8));
-											action = event.getAction();
-											if (action == Action.POINTER_DOWN) {
-												location = event.getLocation();
-												if (location != null) {
-													System.out.println("Localisation du clic : " + location.x + " | " + location.y);
-													var isItemHere = data.clickOnItem(location.x, location.y);
-													System.out.println("isItemHere : " + isItemHere);
-													if (isItemHere != null) {
-														Item clickedItem = (Item) isItemHere.values().toArray()[0];
-														Coordonnees clickedItemPos = (Coordonnees) isItemHere.keySet().toArray()[0];
-														if (data.isItemInInventory(clickedItem)) {
-															if (clickedItem.isWeapon()) {
-																clickedWeapon = (Weapon) clickedItem;
-																data.getHero().equip(clickedWeapon);
-																System.out.println("\nJ'ai cliqué sur une Item de type Weapon\n");
-																if (monster1.health() <= 0) {
-																	System.out.println("-----------------------------------------\nLe premier monstre est mort\n-----------------------------------------");
-																	monster1.setSelected(false);
-																	if (monster2 != null) {
-																		monster2.setSelected(true);
-																	}
-																}
-																if (tour == "hero") {
-																	if (clickedWeapon.getName() != "shield") {
-																		if (monster1.isSelected()) {
-																			data.getHero().attack(monster1);
-																			if (isAttack1) {
-																				monster1.setState("preventAttack");
-																			}
-																			else {
-																				monster1.setState("preventDefense");
-																			}
-																		}
-																		if (monster2 != null) {
-																			if (monster2.isSelected()) {
-																				data.getHero().attack(monster2);
-																				if (isAttack2) {
-																					monster2.setState("preventAttack");
-																				}
-																				else {
-																					monster2.setState("preventDefense");
-																				}
-																			}
-																		}
-																	}
-																	else if (clickedWeapon.getName() == "shield") {
-																		System.out.println("\nJe défend\n");
-																		data.getHero().defend();
-																	}
-																	System.out.println("Energie dépensé pour le monstre 1 : " + clickedWeapon.getEnergyPoint());
-																	System.out.println("Les points de vies du monstre : " + monster1.health());
-																	view.drawCurrentRoom(context, (int) height, (int) width, data);
-																	if (room.areMonstersDead() == true) {
-																		break;
-																	}
-																	if (data.getHero().getEnergyPoint() > 0) {
-																		continue;
-																	}
-																}
-																if (data.getHero().getEnergyPoint() == 0) {
-																	tour = "monster";
-																	count = 1;
-																	data.getHero().resetEnergy();
-																}
-															}
-														}
-													}
-												}
-											}
-											if (tour == "monster") {
-												System.out.println("\nJe suis dans la condition de la tour des monstres\n");
-												Thread.sleep(Duration.ofMillis(600));
-												if (monster1.isAlive()) {
-													if (isAttack1) {
-														monster1.attack(data.getHero());
-														count = 0;
-													}
-													else {
-														count = 0;
-														monster1.defend();
-													}
-													view.drawCurrentRoom(context, (int) height, (int) width, data);
-												}
-												if (monster2 != null && monster2.isAlive()) {
-													Thread.sleep(Duration.ofMillis(600));
-													if (isAttack2) {
-														monster2.attack(data.getHero());
-														count = 0;
-													}
-													else {
-														count = 0;
-														monster2.defend();
-													}
-													view.drawCurrentRoom(context, (int) height, (int) width, data);
-												}
-												tour = "hero";
-												data.getHero().resetDefense();
-											}
-											if ((action == Action.KEY_PRESSED || action == Action.KEY_RELEASED) && event.getKey() == KeyboardKey.Q) {
-												context.exit(0);
-											}
-											if (data.getHero().health() <= 0) {
-												view.drawEndMenu(context, (int) height, (int) width, data);
-												Thread.sleep(Duration.ofSeconds(2));
-												context.exit(0);
-											}
-											if (monster1.isAlive() && count == 1) {
-												monster1.resetDefense();
-											}
-											if (monster2 != null && monster2.isAlive() && count == 1) {
-												monster2.resetDefense();
-											}
-										}
-										data.getHero().resetEnergy();
-										data.getHero().resetDefense();
+								if (room.isThereMonster() && !room.areMonstersDead()) {
+									CombatController combat = new CombatController(context, data, view, width, height);
+									try {
+										combat.startCombat(room);
+									} catch (InterruptedException e) {
+										Thread.currentThread().interrupt();
+										e.printStackTrace();
 									}
 								}
 							}

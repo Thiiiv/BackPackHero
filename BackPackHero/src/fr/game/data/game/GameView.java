@@ -148,9 +148,7 @@ public record GameView(GameData data, ImageLoader loader) {
 		if (item != null) {
 			var image = loader.image(item.itemImage());
 			var sizeItem = item.getSize();
-			// System.out.println(item.itemImage());
 			drawImage(graphics, image, posX, posY, dimx * sizeItem[0].length, dimy * sizeItem.length, data, item);
-			//System.out.println("La position des objets : " + data.getObjectsPosition());
 		}
 	}
 	
@@ -169,13 +167,8 @@ public record GameView(GameData data, ImageLoader loader) {
 				var image = loader.image(item.itemImage());
 				var cellSize = loader.image("cell.png");
 				var sizeItem = item.getSize();
-				// System.out.println(item.itemImage());
 				draw(graphics, context, data);
 				drawImage(graphics, image, posX, posY, cellSize.getWidth() * sizeItem[0].length, cellSize.getHeight() * sizeItem.length, data, item);
-				System.out.println("----------------------------------------------------------------------------------------");
-				System.out.println("Les items présents dans l'interface APRES le déplacement : " + data.getObjectsPosition());
-				System.out.println("----------------------------------------------------------------------------------------");
-				//System.out.println("La position des objets : " + data.getObjectsPosition());
 			}
 		});
 	}
@@ -301,15 +294,12 @@ public record GameView(GameData data, ImageLoader loader) {
 				dimY = 40;
 				posX *= 2;
 				posY = ((height / 2) / 2) - (float) (dimY * 1.5);
-				// System.out.println("posX : " + posX + " posY : " + posY);
 				for (var i = 0; i < 11; i++) {
 					for (var j = 0; j < 5; j++) {
 						if (data.getFloor().getRoom(j, i) != null) {
 							drawRoomOnMap(graphics, dimY, dimX, posX + dimX * i, posY + dimY * j,
 									data.getFloor().getRoom(j, i));
 							if (loader.image(data.getFloor().getRoom(j, i).getRoomIcon()) != null) {
-								// System.out.println("roomIcon : " + data.getFloor().getRoom(j,
-								// i).getRoomIcon());
 								var roomIcon = loader.image(data.getFloor().getRoom(j, i).getRoomIcon());
 								drawImage(graphics, roomIcon, posX + 10 + dimX * i, posY + 10 + dimY * j, dimX / 2,
 										dimY / 2);
@@ -356,6 +346,41 @@ public record GameView(GameData data, ImageLoader loader) {
 			}
 		}
 
+	}
+
+	public void drawDraggedItem(Graphics2D graphics, Item item, float x, float y) {
+		if (item != null) {
+			var image = loader.image(item.itemImage());
+			var size = item.getSize();
+			float itemWidth = (float) (loader.image("cell.png").getWidth() * size[0].length);
+			float itemHeight = (float) (loader.image("cell.png").getHeight() * size.length);
+			drawImage(graphics, image, x - itemWidth / 2, y - itemHeight / 2, itemWidth, itemHeight);
+		}
+	}
+
+	public Coordonnees getInventoryCell(float screenX, float screenY, float width, float height) {
+		var cell = loader.image("cell.png");
+		var backpack = loader.image("backpack.gif");
+		float backpackWidth = (float) (backpack.getWidth() * 0.95);
+		float backpackHeight = (float) (backpack.getHeight() * 0.95);
+		float cellWidth = (float) cell.getWidth();
+		float cellHeight = (float) cell.getHeight();
+
+		// These calculations must match drawInventory
+		float invX = (width / 2) - (float)(2.5 * cellWidth);
+		float invY = backpackHeight / 6;
+
+		if (screenX < invX || screenY < invY) {
+			return null;
+		}
+
+		int col = (int) ((screenX - invX) / cellWidth);
+		int row = (int) ((screenY - invY) / cellHeight);
+
+		if (col >= 0 && col < 5 && row >= 0 && row < 3) {
+			return new Coordonnees(col, row);
+		}
+		return null;
 	}
 	
 	/**
@@ -438,7 +463,6 @@ public record GameView(GameData data, ImageLoader loader) {
 	public void goToRoom(ApplicationContext context, int height, int width, GameData data,
 			Coordonnees roomCoordonnees) {
 		var room = data.getFloor().getRoom(roomCoordonnees.x(), roomCoordonnees.y());
-		System.out.println("les coordonnees envoyés dans setCurrentRoom : x = " + roomCoordonnees.x() + " y = " +roomCoordonnees.y());
 		data.setCurrentRoom(roomCoordonnees.y(), roomCoordonnees.x());
 		data.setInventoryState(true);
 		data.setMapState(false);
@@ -532,14 +556,12 @@ public record GameView(GameData data, ImageLoader loader) {
 			var list = List.of(monster);
 			for (var i = 0; i < monster.length; i++) {
 				if (list.get(i).health() > 0) {
-					//System.out.println("list.get(i).getCharacterImage() : " + list.get(i).getCharacterImage());
 					var image = loader.image(list.get(i).getCharacterImage());
 					if (image != null) {
 						float dimx = (float) (loader.image("hero-4.png").getWidth() * 1.5);
 						float dimy = (float) (loader.image("hero-4.png").getHeight() * 1.5);
 						float posX = (float) (width - (80 + dimx * (i + 1) + i*20));
 						float posY = height - loader.image("hero-4.png").getHeight() * 2;
-						//System.out.println("posX : " + posX + " posY : " + posY);
 						var healthBar = new RoundRectangle2D.Float(posX, posY + dimy + 5, dimx, dimx / 8, 10, 10);
 						drawImage(graphics, image, posX, posY, dimx, dimy);
 						graphics.setColor(Color.BLACK);
@@ -599,11 +621,9 @@ public record GameView(GameData data, ImageLoader loader) {
 		posX = (int) ((width / 2) - 2.5 * dimx);
 		posY = dimy / 6;
 		dimy = (float) (cell.getHeight());
-		//System.out.println(data.getInventory());
 		for (var i = 0; i < 5; i++) {
 			for (var j = 0; j < 3; j++) {
 				drawImage(graphics, cell, posX + dimx * i, posY + dimy * j, dimx, dimy);
-				//System.out.println("Objet a l'emplacement [" + j + ", " + i + "] de l'inventaire : " + inventaire.getFromXY(j, i));
 				
 			}
 		}
@@ -628,13 +648,6 @@ public record GameView(GameData data, ImageLoader loader) {
 		});
 	}
 	
-	/*public void drawCombatMenu(ApplicationContext context, int height, int width, GameData data) {
-		context.renderFrame(graphics -> {
-			graphics.
-		});
-		
-	}*/
-	
 	/**
 	 * Draws the current room on the application interface based on the room type in the game data.
 	 *
@@ -644,7 +657,6 @@ public record GameView(GameData data, ImageLoader loader) {
 	 * @param data      The game data.
 	 */
 	public void drawCurrentRoom(ApplicationContext context, int height, int width, GameData data) {
-		System.out.println("La salle actuelle : " + data.getCurrentRoom().getName());
 		switch(data.getCurrentRoom().getName()) {
 		case "corridor":
 			drawCorridor(context, height, width, data, (Corridor) data.getCurrentRoom());

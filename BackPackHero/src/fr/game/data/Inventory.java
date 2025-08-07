@@ -23,14 +23,42 @@ public class Inventory {
 		return list;
 	}
 	
-	public String add(int x, int y, Item item) {
-		if (x < inventory.length && y < inventory[0].length) {
-			if (inventory[x][y] == null) {
-				inventory[x][y] = item;
-				return "L'item " + item + " a bien été ajouté à l'inventaire";
+	public boolean isSpaceAvailable(int x, int y, Item item) {
+		int[][] size = item.getSize();
+		int itemHeight = size.length;
+		int itemWidth = size[0].length;
+
+		if (x + itemHeight > MAX_ROWS || y + itemWidth > MAX_COLS) {
+			return false; // L'objet dépasse les limites de l'inventaire
+		}
+
+		for (int i = 0; i < itemHeight; i++) {
+			for (int j = 0; j < itemWidth; j++) {
+				if (size[i][j] == 1 && inventory[x + i][y + j] != null) {
+					return false; // Une case nécessaire est déjà occupée
+				}
 			}
 		}
-		return "L'item n'a pas pu être ajouté";
+
+		return true; // L'espace est disponible
+	}
+
+	public String add(int x, int y, Item item) {
+		if (isSpaceAvailable(x, y, item)) {
+			int[][] size = item.getSize();
+			int itemHeight = size.length;
+			int itemWidth = size[0].length;
+
+			for (int i = 0; i < itemHeight; i++) {
+				for (int j = 0; j < itemWidth; j++) {
+					if (size[i][j] == 1) {
+						inventory[x + i][y + j] = item;
+					}
+				}
+			}
+			return "L'item " + item.getName() + " a bien été ajouté à l'inventaire";
+		}
+		return "L'item n'a pas pu être ajouté, l'espace est déjà occupé ou l'objet est trop grand";
 	}
 	
 	@Override

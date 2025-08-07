@@ -38,46 +38,11 @@ public class GameData {
 	public GameData() {
 		this.inventaire = new Inventory();
 		this.hero = new Hero();
-		this.stage1 = new Floor();
-		this.stage2 = new Floor();
-		this.stage3 = new Floor();
+		this.stage1 = LevelGenerator.generateFloor(11, 5);
+		this.stage2 = LevelGenerator.generateFloor(11, 5);
+		this.stage3 = LevelGenerator.generateFloor(11, 5);
 		this.actualStage = stage1;
 		this.objectPositions = new HashMap<Coordonnees, Item>();
-		stage1.add(2, 0, new Corridor(0));
-		stage1.add(2, 1, new Corridor(0));
-		stage1.add(2, 2, new Corridor(2));
-		stage1.add(0, 2, new Corridor(0));
-		stage1.add(1, 2, new Corridor(0));
-		stage1.add(3, 2, new Corridor(0));
-		stage1.add(4, 2, new Corridor(0));
-		stage1.add(0, 3, new Treasure());
-		stage1.add(2, 3, new Corridor(0));
-		stage1.add(4, 3, new Healer());
-		stage1.add(2, 4, new Corridor(0));
-		stage1.add(2, 5, new Corridor(0));
-		stage1.add(3, 5, new Corridor(1));
-		stage1.add(4, 5, new Corridor(0));
-		stage1.add(0, 6, new Treasure());
-		stage1.add(1, 6, new Corridor(0));
-		stage1.add(4, 6, new Corridor(0));
-		stage1.add(1, 7, new Corridor(0));
-		stage1.add(2, 7, new Corridor(0));
-		stage1.add(4, 7, new Corridor(0));
-		stage1.add(0, 8, new ExitDoor());
-		stage1.add(2, 8, new Corridor(0));
-		stage1.add(3, 8, new Corridor(0));
-		stage1.add(4, 8, new Corridor(0));
-		stage1.add(0, 9, new Corridor(0));
-		stage1.add(2, 9, new Corridor(0));
-		stage1.add(4, 9, new Corridor(0));
-		stage1.add(0, 10, new Corridor(0));
-		stage1.add(1, 10, new Corridor(0));
-		stage1.add(2, 10, new Corridor(1));
-		stage1.add(4, 10, new Merchant());
-		stage1.getRoom(2, 0).setHeroHere(true);
-		/*for (var i : stage1.findShortestPath(actualStage, 0, 2, 3, 4)) {
-			System.out.println(i.getName());
-		}*/
 	}
 	
 	/**
@@ -189,7 +154,7 @@ public class GameData {
      * @return The current floor.
      */
 	public Floor getFloor() {
-		return stage1;
+		return actualStage;
 	}
 	
 	/**
@@ -257,10 +222,6 @@ public class GameData {
 			for (var i = 0; i < 5; i++) {
 				for (var j = 0; j < 11; j++) {
 					if (stage1.getRoom(i, j) != null) {
-						System.out.println("Dans clickOnMap : roomX = " + roomX + " roomY = " + roomY);
-						System.out.println("j : " + j + " i : " + i);
-						System.out.println("roomX*j : " + roomX*j + " roomY*i : " + roomY*i);
-						System.out.println("roomX*j+1 : " + roomX*j+1 + " roomY*i+1 : " + roomY*i+1);
 						if (x >= floorX+roomX*j && x <= floorX+roomX*(j+1) && y >= floorY+roomY*i && y <= floorY+roomY*(i+1)) {
 							return new Coordonnees(i, j);
 						}
@@ -408,8 +369,6 @@ public class GameData {
         float dimY = (float) (loader.image("hero-4.png").getHeight() * 1.5);
         float posX = (float) (width - (80 + dimX));
         float posY = height - loader.image("hero-4.png").getHeight() * 2;
-        System.out.println("clickX : " + clickX + " clickY : " + clickY);
-        System.out.println("dimX : " + dimX + " dimY : " + dimY + " posX : " + posX + " posY : " + posY);
         
         if (clickX >= posX && clickX <= posX + dimX &&
             clickY >= posY && clickY <= posY + dimY) {
@@ -450,9 +409,6 @@ public class GameData {
         float noThanksButtonWidth = 400;
         float noThanksButtonHeight = 100;
         
-        System.out.println("\nclickX : " + clickX + " clickY : " + clickY);
-        System.out.println("Position du bouton : " + "x = " + noThanksButtonX + " y = " + noThanksButtonY + " x2 = " + (noThanksButtonX + noThanksButtonWidth) + " y2 = " + (noThanksButtonY + noThanksButtonHeight));
-
         if (clickX >= noThanksButtonX && clickX <= noThanksButtonX + noThanksButtonWidth &&
             clickY >= noThanksButtonY && clickY <= noThanksButtonY + noThanksButtonHeight) {
             return "no-heal"; 
