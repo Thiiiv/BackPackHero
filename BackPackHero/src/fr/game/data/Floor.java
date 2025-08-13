@@ -35,6 +35,14 @@ public class Floor {
 	public Room getRoom(int x, int y) {
 		return floor[x][y];
 	}
+
+	public int getWidth() {
+		return floor[0].length;
+	}
+
+	public int getHeight() {
+		return floor.length;
+	}
 	
 	public ArrayList<Room> getAllRooms() {
 		var list = new ArrayList<Room>();

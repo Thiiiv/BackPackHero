@@ -279,47 +279,51 @@ public record GameView(GameData data, ImageLoader loader) {
 	 * @param data    The game data.
 	 * @return An array of floats representing the x and y coordinates, and dimensions (dimX and dimY) of the drawn map.
 	 */
-	public float[] drawMap(ApplicationContext context, int height, int width, GameData data) {
-		if (data.getMapState()) {
-			var coordonnees = new float[4];
-			context.renderFrame(graphics -> {
-				draw(graphics, context, data);
-				var image = loader.image("map.png");
-				float dimX = (float) (4 * width / 6);
-				float dimY = (float) (height / 2);
-				float posX = (float) (width / 6);
-				float posY = 0;
-				drawImage(graphics, image, posX, posY, dimX, dimY);
-				dimX = 40;
-				dimY = 40;
-				posX *= 2;
-				posY = ((height / 2) / 2) - (float) (dimY * 1.5);
-				for (var i = 0; i < 11; i++) {
-					for (var j = 0; j < 5; j++) {
-						if (data.getFloor().getRoom(j, i) != null) {
-							drawRoomOnMap(graphics, dimY, dimX, posX + dimX * i, posY + dimY * j,
-									data.getFloor().getRoom(j, i));
-							if (loader.image(data.getFloor().getRoom(j, i).getRoomIcon()) != null) {
-								var roomIcon = loader.image(data.getFloor().getRoom(j, i).getRoomIcon());
-								drawImage(graphics, roomIcon, posX + 10 + dimX * i, posY + 10 + dimY * j, dimX / 2,
-										dimY / 2);
-							}
-							if (data.getFloor().getRoom(j, i).isHeroHere()) {
-								drawImage(graphics, loader.image("heroIcon.png"), posX + 10 + dimX * i,
-										posY + 10 + dimY * j, dimX / 2, dimY / 2);
-							}
-						}
-					}
-				}
-				coordonnees[0] = posX;
-				coordonnees[1] = posY;
-				coordonnees[2] = dimX;
-				coordonnees[3] = dimY;
-			});
+	public void drawMapOverlay(Graphics2D graphics, int height, int width) {
+        var image = loader.image("map.png");
+        float dimX = (float) (4 * width / 6);
+        float dimY = (float) (height / 2);
+        float posX = (float) (width / 6);
+        float posY = 0;
+        drawImage(graphics, image, posX, posY, dimX, dimY);
+        dimX = 40;
+        dimY = 40;
+        posX *= 2;
+        posY = ((height / 2) / 2) - (float) (dimY * 1.5);
+        for (var i = 0; i < data.getFloor().getWidth(); i++) {
+            for (var j = 0; j < data.getFloor().getHeight(); j++) {
+                if (data.getFloor().getRoom(j, i) != null) {
+                    drawRoomOnMap(graphics, dimY, dimX, posX + dimX * i, posY + dimY * j,
+                            data.getFloor().getRoom(j, i));
+                    if (loader.image(data.getFloor().getRoom(j, i).getRoomIcon()) != null) {
+                        var roomIcon = loader.image(data.getFloor().getRoom(j, i).getRoomIcon());
+                        drawImage(graphics, roomIcon, posX + 10 + dimX * i, posY + 10 + dimY * j, dimX / 2,
+                                dimY / 2);
+                    }
+                    if (data.getFloor().getRoom(j, i).isHeroHere()) {
+                        drawImage(graphics, loader.image("heroIcon.png"), posX + 10 + dimX * i,
+                                posY + 10 + dimY * j, dimX / 2, dimY / 2);
+                    }
+                }
+            }
+        }
+    }
 
-			return coordonnees;
-		}
-		return null;
+	public float[] getMapCoords(int height, int width) {
+		var coordonnees = new float[4];
+		float dimX = (float) (4 * width / 6);
+		float dimY = (float) (height / 2);
+		float posX = (float) (width / 6);
+		float posY = 0;
+		dimX = 40;
+		dimY = 40;
+		posX *= 2;
+		posY = ((height / 2) / 2) - (float) (dimY * 1.5);
+		coordonnees[0] = posX;
+		coordonnees[1] = posY;
+		coordonnees[2] = dimX;
+		coordonnees[3] = dimY;
+		return coordonnees;
 	}
 	
 	/**
@@ -377,7 +381,7 @@ public record GameView(GameData data, ImageLoader loader) {
 		int col = (int) ((screenX - invX) / cellWidth);
 		int row = (int) ((screenY - invY) / cellHeight);
 
-		if (col >= 0 && col < 5 && row >= 0 && row < 3) {
+		if (col >= 0 && col < data.getInventory().getWidth() && row >= 0 && row < data.getInventory().getHeight()) {
 			return new Coordonnees(col, row);
 		}
 		return null;
@@ -405,16 +409,13 @@ public record GameView(GameData data, ImageLoader loader) {
 	 * @param data      The game data.
 	 * @param healer    The healer data.
 	 */
-	public void drawHealer(ApplicationContext context, int height, int width, GameData data, Healer healer) {
-		context.renderFrame(graphics -> {
-			draw(graphics, context, data);
-			var image = loader.image(healer.getImage());
-			float dimx = (float) (loader.image("hero-4.png").getWidth() * 1.5);
-			float dimy = (float) (loader.image("hero-4.png").getHeight() * 1.5);
-			float posX = (float) (width - (80 + dimx));
-			float posY = height - loader.image("hero-4.png").getHeight() * 2;
-			drawImage(graphics, image, posX, posY, dimx, dimy);
-		});
+	public void drawHealer(Graphics2D graphics, int height, int width, Healer healer) {
+        var image = loader.image(healer.getImage());
+        float dimx = (float) (loader.image("hero-4.png").getWidth() * 1.5);
+        float dimy = (float) (loader.image("hero-4.png").getHeight() * 1.5);
+        float posX = (float) (width - (80 + dimx));
+        float posY = height - loader.image("hero-4.png").getHeight() * 2;
+        drawImage(graphics, image, posX, posY, dimx, dimy);
 	}
 	
 	/**
@@ -426,16 +427,13 @@ public record GameView(GameData data, ImageLoader loader) {
 	 * @param data      The game data.
 	 * @param merchant  The merchant data.
 	 */
-	public void drawMerchant(ApplicationContext context, int height, int width, GameData data, Merchant merchant) {
-		context.renderFrame(graphics -> {
-			draw(graphics, context, data);
-			var image = loader.image(merchant.getImage());
-			float dimx = (float) (loader.image("hero-4.png").getWidth() * 1.5);
-			float dimy = (float) (loader.image("hero-4.png").getHeight() * 1.5);
-			float posX = (float) (width - (80 + dimx));
-			float posY = height - loader.image("hero-4.png").getHeight() * 2;
-			drawImage(graphics, image, posX, posY, dimx, dimy);
-		});
+	public void drawMerchant(Graphics2D graphics, int height, int width, Merchant merchant) {
+        var image = loader.image(merchant.getImage());
+        float dimx = (float) (loader.image("hero-4.png").getWidth() * 1.5);
+        float dimy = (float) (loader.image("hero-4.png").getHeight() * 1.5);
+        float posX = (float) (width - (80 + dimx));
+        float posY = height - loader.image("hero-4.png").getHeight() * 2;
+        drawImage(graphics, image, posX, posY, dimx, dimy);
 	}
 	
 	/**
@@ -547,55 +545,48 @@ public record GameView(GameData data, ImageLoader loader) {
 	 * @param data      The game data.
 	 * @param monster   The monster data.
 	 */
-	public void drawMonster(ApplicationContext context, int height, int width, GameData data, Monster... monster) {
-		context.renderFrame(graphics -> {
-			var length = 1;
-			/*if (additionalMonster == null) {
-				length = 1;
-			}*/
-			var list = List.of(monster);
-			for (var i = 0; i < monster.length; i++) {
-				if (list.get(i).health() > 0) {
-					var image = loader.image(list.get(i).getCharacterImage());
-					if (image != null) {
-						float dimx = (float) (loader.image("hero-4.png").getWidth() * 1.5);
-						float dimy = (float) (loader.image("hero-4.png").getHeight() * 1.5);
-						float posX = (float) (width - (80 + dimx * (i + 1) + i*20));
-						float posY = height - loader.image("hero-4.png").getHeight() * 2;
-						var healthBar = new RoundRectangle2D.Float(posX, posY + dimy + 5, dimx, dimx / 8, 10, 10);
-						drawImage(graphics, image, posX, posY, dimx, dimy);
-						graphics.setColor(Color.BLACK);
-						graphics.fill(healthBar);
-						graphics.setColor(new Color(168, 38, 52, 255));
-						graphics.fill(new RoundRectangle2D.Float((float) healthBar.getX(), (float) healthBar.getY(),
-								(float) healthBar.getWidth() * ((float) list.get(i).health() / list.get(i).maxHealth()),
-								(float) healthBar.getHeight(), 10, 10));
-						graphics.setColor(Color.WHITE);
-						Font font = new Font("Lucida Sans", Font.BOLD, 25);
-						graphics.setFont(font);
-						graphics.drawString(list.get(i).health() + "/" + list.get(i).maxHealth(),
-								(posX + dimx) - font.getSize() * 3, posY + dimy + dimx / 8);
-						if (list.get(i).whichState() == "preventAttack") {
-							image = loader.image("attack.png");
-							drawImage(graphics, image, (float) posX * 0.978f, (float) posY * 0.95f, image.getWidth()/1.5f, image.getHeight()/1.5f);
-							graphics.drawString(list.get(i).attackPoint() + "", (float) healthBar.getX(), (float) posY);
-						}
-						if (list.get(i).whichState() == "preventDefense") {
-							image = loader.image("protection.png");
-							drawImage(graphics, image, (float) posX * 0.978f, (float) posY * 0.95f, image.getWidth()/1.5f, image.getHeight()/1.5f);
-							graphics.drawString(list.get(i).getDefenseGain() + "", (float) healthBar.getX(), (float) posY);
-						}
-						
-						if (list.get(i).defensePoint() > 0) {
-							image = loader.image("protection.png");
-							drawImage(graphics, image, (float) healthBar.getX() - (image.getWidth()/4), (float) healthBar.getY() - (image.getHeight()/4), image.getWidth()/1.5f, image.getHeight()/1.5f);
-							graphics.drawString(list.get(i).defensePoint() + "", (float) healthBar.getX(), (float) healthBar.getY() + 20);
-						}
-					}
-				}
-			}
-		});
+	public void drawMonster(Graphics2D graphics, int height, int width, Monster... monster) {
+        var list = List.of(monster);
+        for (var i = 0; i < monster.length; i++) {
+            if (list.get(i).health() > 0) {
+                var image = loader.image(list.get(i).getCharacterImage());
+                if (image != null) {
+                    float dimx = (float) (loader.image("hero-4.png").getWidth() * 1.5);
+                    float dimy = (float) (loader.image("hero-4.png").getHeight() * 1.5);
+                    float posX = (float) (width - (80 + dimx * (i + 1) + i*20));
+                    float posY = height - loader.image("hero-4.png").getHeight() * 2;
+                    var healthBar = new RoundRectangle2D.Float(posX, posY + dimy + 5, dimx, dimx / 8, 10, 10);
+                    drawImage(graphics, image, posX, posY, dimx, dimy);
+                    graphics.setColor(Color.BLACK);
+                    graphics.fill(healthBar);
+                    graphics.setColor(new Color(168, 38, 52, 255));
+                    graphics.fill(new RoundRectangle2D.Float((float) healthBar.getX(), (float) healthBar.getY(),
+                            (float) healthBar.getWidth() * ((float) list.get(i).health() / list.get(i).maxHealth()),
+                            (float) healthBar.getHeight(), 10, 10));
+                    graphics.setColor(Color.WHITE);
+                    Font font = new Font("Lucida Sans", Font.BOLD, 25);
+                    graphics.setFont(font);
+                    graphics.drawString(list.get(i).health() + "/" + list.get(i).maxHealth(),
+                            (posX + dimx) - font.getSize() * 3, posY + dimy + dimx / 8);
+                    if (list.get(i).whichState().equals("preventAttack")) {
+                        image = loader.image("attack.png");
+                        drawImage(graphics, image, (float) posX * 0.978f, (float) posY * 0.95f, image.getWidth()/1.5f, image.getHeight()/1.5f);
+                        graphics.drawString(list.get(i).attackPoint() + "", (float) healthBar.getX(), (float) posY);
+                    }
+                    if (list.get(i).whichState().equals("preventDefense")) {
+                        image = loader.image("protection.png");
+                        drawImage(graphics, image, (float) posX * 0.978f, (float) posY * 0.95f, image.getWidth()/1.5f, image.getHeight()/1.5f);
+                        graphics.drawString(list.get(i).getDefenseGain() + "", (float) healthBar.getX(), (float) posY);
+                    }
 
+                    if (list.get(i).defensePoint() > 0) {
+                        image = loader.image("protection.png");
+                        drawImage(graphics, image, (float) healthBar.getX() - (image.getWidth()/4), (float) healthBar.getY() - (image.getHeight()/4), image.getWidth()/1.5f, image.getHeight()/1.5f);
+                        graphics.drawString(list.get(i).defensePoint() + "", (float) healthBar.getX(), (float) healthBar.getY() + 20);
+                    }
+                }
+            }
+        }
 	}
 	
 	/**
@@ -621,8 +612,8 @@ public record GameView(GameData data, ImageLoader loader) {
 		posX = (int) ((width / 2) - 2.5 * dimx);
 		posY = dimy / 6;
 		dimy = (float) (cell.getHeight());
-		for (var i = 0; i < 5; i++) {
-			for (var j = 0; j < 3; j++) {
+		for (var i = 0; i < data.getInventory().getWidth(); i++) {
+			for (var j = 0; j < data.getInventory().getHeight(); j++) {
 				drawImage(graphics, cell, posX + dimx * i, posY + dimy * j, dimx, dimy);
 				
 			}
@@ -758,7 +749,30 @@ public record GameView(GameData data, ImageLoader loader) {
 	 * @param view      The game view.
 	 */
 	public static void draw(ApplicationContext context, GameData data, GameView view) {
-		context.renderFrame(graphics -> view.draw(graphics, context, data));
+		context.renderFrame(graphics -> view.drawEverything(graphics, context));
 	}
 
+	public void drawEverything(Graphics2D graphics, ApplicationContext context) {
+		var screenInfo = context.getScreenInfo();
+		var width = screenInfo.getWidth();
+		var height = screenInfo.getHeight();
+
+		if (data.getMenuState()) {
+			drawMenu(graphics, (int)width, (int)height, data);
+		} else {
+			drawBackground(graphics, (int)height, (int)width, data);
+			drawInventory(graphics, (int)height, (int)width, data);
+			drawHero(graphics, (int)height, (int)width, data);
+            // drawCurrentRoom(graphics, (int)height, (int)width);
+
+			if (data.getMapState()) {
+				drawMapOverlay(graphics, (int)height, (int)width);
+			}
+
+            // Draw UI buttons on top
+            var mapButton = data.getInventoryState() ? "mapButton.png" : "inventoryButton.png";
+            var mapButtonImg = loader.image(mapButton);
+            drawImage(graphics, mapButtonImg, width - mapButtonImg.getWidth(), mapButtonImg.getHeight(), mapButtonImg.getWidth(), mapButtonImg.getHeight());
+		}
+	}
 }

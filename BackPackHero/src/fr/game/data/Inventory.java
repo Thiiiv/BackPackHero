@@ -164,4 +164,12 @@ public class Inventory {
 	public Item getFromXY(int x, int y) {
 		return this.inventory[x][y];
 	}
+
+	public int getWidth() {
+		return MAX_COLS;
+	}
+
+	public int getHeight() {
+		return MAX_ROWS;
+	}
 }

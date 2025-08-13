@@ -218,10 +218,10 @@ public class GameData {
      * @return The coordinates of the clicked room on the map, or null if no room is clicked.
      */
 	public Coordonnees clickOnMap(float x, float y, float floorX, float floorY, int roomX, int roomY) {
-		if (x >= floorX && x <= floorX+roomX*11 && y >= floorY && y <= floorY+roomY*5) {
-			for (var i = 0; i < 5; i++) {
-				for (var j = 0; j < 11; j++) {
-					if (stage1.getRoom(i, j) != null) {
+		if (x >= floorX && x <= floorX+roomX*actualStage.getWidth() && y >= floorY && y <= floorY+roomY*actualStage.getHeight()) {
+			for (var i = 0; i < actualStage.getHeight(); i++) {
+				for (var j = 0; j < actualStage.getWidth(); j++) {
+					if (actualStage.getRoom(i, j) != null) {
 						if (x >= floorX+roomX*j && x <= floorX+roomX*(j+1) && y >= floorY+roomY*i && y <= floorY+roomY*(i+1)) {
 							return new Coordonnees(i, j);
 						}
@@ -286,8 +286,8 @@ public class GameData {
      * @return The current room where the hero is located, or null if the hero is not in any room.
      */
 	public Room getCurrentRoom() {
-		for (int i = 0; i < 5; i++) {
-			for (int j = 0; j < 11; j++) {
+		for (int i = 0; i < actualStage.getHeight(); i++) {
+			for (int j = 0; j < actualStage.getWidth(); j++) {
 				if (actualStage.getRoom(i, j) != null) {
 					if (actualStage.getRoom(i, j).isHeroHere()) {
 						return actualStage.getRoom(i, j);
@@ -309,8 +309,8 @@ public class GameData {
 		if (actualStage.getRoom(y, x) == null) {
 			return false;
 		}
-		for (int i = 0; i < 5; i++) {
-			for (int j = 0; j < 11; j++) {
+		for (int i = 0; i < actualStage.getHeight(); i++) {
+			for (int j = 0; j < actualStage.getWidth(); j++) {
 				if (actualStage.getRoom(i, j) != null) {
 					if (actualStage.getRoom(i, j).isHeroHere()) {
 						actualStage.getRoom(i, j).setHeroHere(false);

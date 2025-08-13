@@ -212,7 +212,7 @@ public class GameController {
 				var location = event.getLocation();
 				if (location != null && draggedItemWrapper.item == null) {
 					Room CurentRoom=data.getCurrentRoom();
-                    if (CurentRoom.getName()=="healer") {
+                    if (CurentRoom != null && CurentRoom.getName().equals("healer")) {
                     	if(data.isClickedInRoom(location.x, location.y, height, width)) {
                             view.drawMenuHealer(context,width,height, data);
                             while(true){
@@ -243,14 +243,9 @@ public class GameController {
 					if (detectButton != null) {
 						switch (detectButton) {
 						case "mapButton":
-							System.out.println("Il faut dessiner le bouton map");
-							System.out.println("Voici les états des boutons : InventoryButton = " + data.getInventoryState() + " MapButton = " + data.getMapState());
-							floorCoordonnees = view.drawMap(context, (int) height, (int) width, data);
-							view.drawInventoryButton(context, (int) height, (int) width, data);
+							floorCoordonnees = view.getMapCoords((int) height, (int) width);
 							break;
 						case "inventoryButton":
-							System.out.println("Il faut dessiner le bouton inventaire");
-							System.out.println("Voici les états des boutons : InventoryButton = " + data.getInventoryState() + " MapButton = " + data.getMapState());
 							GameView.draw(context, data, view);
 							break;
 						}
